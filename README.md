@@ -1,20 +1,22 @@
-# instagram-posts
+# Marcelo Matos · Dev & IA — @marcelomatos.dev
 
-Fila pública de posts do **@marcelomatos.dev**. Cada post = `slug.png` + `slug.json` (mesmo nome).
+> Automatizo o trabalho manual da sua empresa: **sistemas, integrações e chatbots sob medida**.
+> Menos tarefa repetitiva, mais tempo pro que importa.
 
-- `posts-queue/aprovacao/` — aguardando aprovação
-- `posts-queue/aprovado/` — liberado; o n8n publica no horário. O campo `published_at` no JSON marca o que já foi publicado (e evita republicar).
+## 👋 Quem sou
+Desenvolvedor há 15+ anos. Sou o **braço de TI que sua empresa não precisa contratar**:
+entrego, documento e não sumo depois.
 
-Exemplo de `slug.json`:
+## ⚙️ O que eu resolvo
+- Automação de processos (o carro-chefe)
+- Integrações entre sistemas que você já usa
+- Chatbots e agentes de IA que atendem 24h
+- DevOps e infraestrutura que não cai
 
-```json
-{
-  "scheduled_for": "2026-07-07T09:00:00-03:00",
-  "pillar": "dor",
-  "caption": "🤖 Legenda completa...\n\n#automacao #pequenaempresa #saopaulo",
-  "ig_media_id": null,
-  "published_at": null
-}
-```
+## 📲 Diagnóstico de automação **grátis**
+Tem uma tarefa manual consumindo o tempo da equipe? Fala comigo:
+- Instagram: [@marcelomatos.dev](https://instagram.com/marcelomatos.dev)
+- WhatsApp: [wa.me/5511977974431](https://wa.me/5511977974431?text=Quero%20meu%20diagn%C3%B3stico%20de%20automa%C3%A7%C3%A3o)
 
-**NUNCA** commitar tokens/segredos aqui — repositório é público. Os segredos ficam só no n8n.
+---
+_Atendimento remoto (Brasil) e presencial (São Paulo)._
