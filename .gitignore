@@ -1,3 +1,6 @@
 *.token
 .env
 ig_token
+
+# tooling local do scheduler (não versionar)
+.scheduler/
