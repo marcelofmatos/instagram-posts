@@ -11,7 +11,7 @@ entrego, documento e não sumo depois.
 - Automação de processos (o carro-chefe)
 - Integrações entre sistemas que você já usa
 - Chatbots e agentes de IA que atendem 24h
-- DevOps e infraestrutura que não cai
+- DevOps e infraestrutura em nuvem
 
 ## 📲 Diagnóstico de automação **grátis**
 Tem uma tarefa manual consumindo o tempo da equipe? Fala comigo:
