@@ -100,7 +100,9 @@ PROMPT="${PROMPT/__RECENTES__/$RECENTES}"
 PROMPT="${PROMPT/__TEMA__/$TEMA_TXT}"
 
 log "chamando claude -p ($MODEL)…"
-call_claude() { printf '%s' "$PROMPT" | claude -p --model "$MODEL" --allowedTools "WebSearch,Write" >>"$LOG" 2>&1; }
+# Roda a partir de $OUT: o claude grava os arquivos no cwd, então o cwd precisa
+# ser o diretório de saída (subshell preserva o cwd /repo do restante do script).
+call_claude() { ( cd "$OUT" && printf '%s' "$PROMPT" | claude -p --model "$MODEL" --allowedTools "WebSearch,Write" ) >>"$LOG" 2>&1; }
 retry "claude -p" -- call_claude || abort "claude -p falhou (ver log)"
 
 # ===== 4. Validar os JSONs =====
