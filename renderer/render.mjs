@@ -25,7 +25,10 @@ let HAS_CONVERT = false;
 try { execFileSync('which', ['convert']); HAS_CONVERT = true; } catch {}
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-let template = readFileSync(join(__dir, 'template.html'), 'utf8');
+// Template padrão: template.html. Para usar o v2 (eyebrow em chip, barra de
+// acento e CTA em pílula), exporte POST_TEMPLATE=template-v2.html antes de rodar.
+const templateFile = process.env.POST_TEMPLATE || 'template.html';
+let template = readFileSync(join(__dir, templateFile), 'utf8');
 
 // Embute as fontes inline com caminho absoluto — o HTML é gravado na pasta de
 // saída, então um href relativo a fonts.css quebraria (fallback p/ serifa).

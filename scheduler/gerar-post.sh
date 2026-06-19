@@ -16,6 +16,9 @@ MODEL="${MODEL:-sonnet}"
 REPO_SLUG="${REPO_SLUG:-marcelofmatos/instagram-posts}"
 WA_WEBHOOK="${WA_WEBHOOK:-}"
 WA_NUM="${WA_NUM:-}"
+# Template da arte: v2 (eyebrow em chip, barra de acento, CTA em pílula), como no v1.
+# Configurável por env; o render.mjs lê POST_TEMPLATE.
+export POST_TEMPLATE="${POST_TEMPLATE:-template-v2.html}"
 
 DRY=0
 TEMA=""
