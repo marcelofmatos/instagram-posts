@@ -86,7 +86,7 @@ STEP="pilar/dedup"
 DOW="$(date +%u)"
 PILAR="$(pilar_do_dia "$DOW")"
 export POST_PILLAR="$PILAR"   # fallback de ícone de fundo no render.mjs (v3)
-SCHED="$(proximo_dia_util_0900 "$TODAY")"
+SCHED="$(proximo_horario_publicacao)"
 RECENTES="$(temas_recentes "$HIST" 10)"
 [ -z "$RECENTES" ] && RECENTES="(nenhum ainda)"
 log "pilar=$PILAR scheduled_for=$SCHED tema=${TEMA:-livre}"

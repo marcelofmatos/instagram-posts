@@ -21,6 +21,15 @@ check "pilar dom (fallback)" "dor" "$(pilar_do_dia 7)"
 check "slugify simples" "mitos-automacao-pme" "$(slugify 'Mitos Automacao PME')"
 check "slugify pontuação" "tres-coisas" "$(slugify 'Tres   Coisas!!!')"
 
+# proximo_horario_publicacao: slots 12:00 (manhã) e 19:00 (tarde) do mesmo dia;
+# se já passou dos dois, 12:00 do dia seguinte (literal, sem pular fim de semana).
+check "antes das 12h -> manhã hoje"      "2026-06-19T12:00:00-03:00" "$(proximo_horario_publicacao '2026-06-19 09:00:00')"
+check "12h em ponto -> tarde hoje"       "2026-06-19T19:00:00-03:00" "$(proximo_horario_publicacao '2026-06-19 12:00:00')"
+check "à tarde -> tarde hoje"            "2026-06-19T19:00:00-03:00" "$(proximo_horario_publicacao '2026-06-19 15:30:00')"
+check "19h em ponto -> manhã amanhã"     "2026-06-20T12:00:00-03:00" "$(proximo_horario_publicacao '2026-06-19 19:00:00')"
+check "à noite -> manhã do dia seguinte" "2026-06-20T12:00:00-03:00" "$(proximo_horario_publicacao '2026-06-19 21:00:00')"
+check "sexta à noite -> sábado (literal)" "2026-06-20T12:00:00-03:00" "$(proximo_horario_publicacao '2026-06-19 23:00:00')"
+
 # retry: falha 1x e sucede na 2ª (sem espera)
 attempts=0
 flaky() { attempts=$((attempts+1)); [ "$attempts" -ge 2 ]; }
