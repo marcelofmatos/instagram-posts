@@ -75,6 +75,11 @@ const total = list.length;
 for (let idx = 0; idx < total; idx++) {
   const p = list[idx];
   const num = String(p.num ?? (idx + 1)).padStart(2, '0');
+  const imgPath = join(outDir, `img-${num}.jpg`);
+  const hasPhoto = existsSync(imgPath);
+  const photoLayer = hasPhoto
+    ? `<div class="photo" style="background-image:url(file://${imgPath})"></div><div class="scrim"></div>`
+    : '';
   // bolinhas de progresso: só em carrossel (>1 lâmina); vazio em imagem única
   const progress = total > 1
     ? '<div class="dots">' + Array.from({ length: total }, (_, i) =>
@@ -87,7 +92,8 @@ for (let idx = 0; idx < total; idx++) {
     .replace('{{TITLE}}', esc(p.title || ''))
     .replace('{{CONTENT}}', buildContent(p))
     .replace('{{CTA}}', esc(p.cta || 'WhatsApp na bio →'))
-    .replace('{{BG_ICON}}', esc(bgFor(p)));
+    .replace('{{BG_ICON}}', esc(hasPhoto ? '' : bgFor(p)))
+    .replace('{{PHOTO_LAYER}}', photoLayer);
 
   const base = `post-${num || 'x'}`;
   const htmlPath = join(outDir, `${base}.html`);
