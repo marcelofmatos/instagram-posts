@@ -102,7 +102,10 @@ PROMPT="${PROMPT/__TEMA__/$TEMA_TXT}"
 log "chamando claude -p ($MODEL)…"
 # Roda a partir de $OUT: o claude grava os arquivos no cwd, então o cwd precisa
 # ser o diretório de saída (subshell preserva o cwd /repo do restante do script).
-call_claude() { ( cd "$OUT" && printf '%s' "$PROMPT" | claude -p --model "$MODEL" --allowedTools "WebSearch,Write" ) >>"$LOG" 2>&1; }
+# timeout: o claude -p pode travar esperando aprovação interativa (ex.: tentar uma
+# ferramenta fora do --allowedTools); o timeout garante que o retry assuma em vez
+# de pendurar o pipeline e segurar o lock indefinidamente.
+call_claude() { ( cd "$OUT" && printf '%s' "$PROMPT" | timeout "${CLAUDE_TIMEOUT:-600}" claude -p --model "$MODEL" --allowedTools "WebSearch,Write" ) >>"$LOG" 2>&1; }
 retry "claude -p" -- call_claude || abort "claude -p falhou (ver log)"
 
 # ===== 4. Validar os JSONs =====

@@ -29,7 +29,8 @@ rotate_logs() {
 seed_claude_config() {
   local target="$HOME/.claude.json" seed="${CLAUDE_SEED:-/seed/claude.json}"
   [ -f "$target" ] && return 0
-  [ -f "$seed" ] && cp "$seed" "$target"
+  [ -f "$seed" ] || return 0
+  cp "$seed" "$target" || echo "[entrypoint] AVISO: não consegui semear $target a partir de $seed" >&2
   return 0
 }
 
