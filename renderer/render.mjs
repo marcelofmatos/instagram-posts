@@ -64,6 +64,10 @@ function titleSize(title) {
   return 66;
 }
 
+// Ícone de fundo (v3): vem de p.bg; se ausente, cai no fallback por pilar (POST_PILLAR).
+const PILLAR_ICON = { 'dor': '⚠️', 'antes-depois': '🔄', 'educacao': '💡', 'prova': '📊' };
+const bgFor = p => p.bg || PILLAR_ICON[process.env.POST_PILLAR] || '';
+
 const posts = JSON.parse(readFileSync(postsPath, 'utf8'));
 const list = Array.isArray(posts) ? posts : [posts];
 
@@ -82,7 +86,8 @@ for (let idx = 0; idx < total; idx++) {
     .replace('{{EYEBROW}}', esc(p.eyebrow || ''))
     .replace('{{TITLE}}', esc(p.title || ''))
     .replace('{{CONTENT}}', buildContent(p))
-    .replace('{{CTA}}', esc(p.cta || 'WhatsApp na bio →'));
+    .replace('{{CTA}}', esc(p.cta || 'WhatsApp na bio →'))
+    .replace('{{BG_ICON}}', esc(bgFor(p)));
 
   const base = `post-${num || 'x'}`;
   const htmlPath = join(outDir, `${base}.html`);
