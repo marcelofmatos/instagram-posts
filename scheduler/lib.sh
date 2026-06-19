@@ -21,16 +21,21 @@ slugify() {
     | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//'
 }
 
-# proximo_dia_util_0900 <YYYY-MM-DD>  -> ISO do PRÓXIMO dia útil às 09:00 -03:00
-proximo_dia_util_0900() {
-  local base="$1" d
-  d="$base"
-  while :; do
-    d="$(date -d "$d + 1 day" +%Y-%m-%d)"
-    local dow; dow="$(date -d "$d" +%u)"   # 1..7
-    if [ "$dow" -le 5 ]; then break; fi    # seg..sex
-  done
-  echo "${d}T09:00:00-03:00"
+# proximo_horario_publicacao [<ref>]  -> ISO do próximo slot de publicação (-03:00).
+# Slots = os horários em que o n8n publica: 12:00 (manhã) e 19:00 (tarde).
+# Mesmo dia se ainda houver slot no futuro; senão, 12:00 do dia seguinte (literal,
+# sem pular fim de semana). <ref> = data/hora de referência (default: agora).
+proximo_horario_publicacao() {
+  local ref="${1:-now}" hm dia
+  hm="$(date -d "$ref" +%H%M)"
+  dia="$(date -d "$ref" +%Y-%m-%d)"
+  if [ "$((10#$hm))" -lt 1200 ]; then
+    echo "${dia}T12:00:00-03:00"
+  elif [ "$((10#$hm))" -lt 1900 ]; then
+    echo "${dia}T19:00:00-03:00"
+  else
+    echo "$(date -d "$ref + 1 day" +%Y-%m-%d)T12:00:00-03:00"
+  fi
 }
 
 # temas_recentes <arquivo_ndjson> <n>  -> títulos das últimas n linhas
