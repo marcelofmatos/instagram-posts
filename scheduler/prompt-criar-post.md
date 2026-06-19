@@ -54,12 +54,13 @@ Decida pelo tema/pilar:
 1. Arquivo `__OUTDIR__/conteudo.json` — array de slides no formato da skill de arte:
    - **1 item** (imagem única) **OU 3 a 6 itens** (carrossel). Nunca 2.
    - Cada item: `num` (sequencial 1,2,3…), `eyebrow` (CAIXA ALTA), `title` (curto, legível no thumbnail),
-     **um** de `body`/`bullets`/`steps`, `cta`.
+     **um** de `body`/`bullets`/`steps`, `cta`, e `bg` (UM emoji só — sem texto — que ilustra a ideia
+     daquela lâmina; ex.: ⏱️ tempo, 🧩 integração, 💸 custo, 📉 perda, 🤖 automação).
 ```json
 [
-  { "num": 1, "eyebrow": "RÓTULO", "title": "Capa curta e forte", "body": "Gancho.", "cta": "Arrasta →" },
-  { "num": 2, "eyebrow": "RÓTULO", "title": "Lâmina de valor", "bullets": [{ "ic": "⚙️", "text": "ponto" }], "cta": "Arrasta →" },
-  { "num": 3, "eyebrow": "BORA", "title": "Fala comigo", "body": "CTA final.", "cta": "WhatsApp na bio →" }
+  { "num": 1, "eyebrow": "RÓTULO", "title": "Capa curta e forte", "body": "Gancho.", "cta": "Arrasta →", "bg": "⏱️" },
+  { "num": 2, "eyebrow": "RÓTULO", "title": "Lâmina de valor", "bullets": [{ "ic": "⚙️", "text": "ponto" }], "cta": "Arrasta →", "bg": "🧩" },
+  { "num": 3, "eyebrow": "BORA", "title": "Fala comigo", "body": "CTA final.", "cta": "WhatsApp na bio →", "bg": "💬" }
 ]
 ```
    - `eyebrow` por pilar: dor→`DOR`/`PARE DE PERDER TEMPO`; antes-depois→`ANTES x DEPOIS`; educacao→`SEM JURIDIQUÊS`; prova→`PROVA`/`RESULTADO`.
