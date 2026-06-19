@@ -44,10 +44,11 @@
   }
   .canvas>*{position:relative;z-index:1}
 
-  /* v3: ícone temático de fundo — grande, apagado, atrás do conteúdo */
+  /* v3: ícone temático de fundo — apagado, no canto SUPERIOR DIREITO (área livre ao
+     lado do cabeçalho, acima do eyebrow); não cruza título/corpo/rodapé. */
   .bgicon{
-    position:absolute;right:-30px;bottom:90px;z-index:0;
-    font-size:560px;line-height:1;opacity:.13;pointer-events:none;
+    position:absolute;top:95px;right:-10px;z-index:0;
+    font-size:440px;line-height:1;opacity:.13;pointer-events:none;
     filter:saturate(.85);
   }
 
