@@ -17,5 +17,15 @@ tmp_new="$(mktemp -d)"; rmdir "$tmp_new"
 check "estado init (remoto inexistente)" "init" \
   "$(REPO_DIR="$tmp_new" REPO_GIT_URL='file:///nao/existe/x.git' bootstrap_state)"
 
-rm -rf "$tmp_ready"
+# seed_claude_config: copia o seed quando o config ainda não existe
+tmp_home="$(mktemp -d)"; seed_file="$(mktemp)"; echo '{"x":1}' > "$seed_file"
+HOME="$tmp_home" CLAUDE_SEED="$seed_file" seed_claude_config
+check "seed copia config ausente" '{"x":1}' "$(cat "$tmp_home/.claude.json" 2>/dev/null)"
+
+# seed_claude_config: NÃO sobrescreve um config já existente
+echo '{"keep":1}' > "$tmp_home/.claude.json"
+HOME="$tmp_home" CLAUDE_SEED="$seed_file" seed_claude_config
+check "seed não sobrescreve existente" '{"keep":1}' "$(cat "$tmp_home/.claude.json" 2>/dev/null)"
+
+rm -rf "$tmp_ready" "$tmp_home" "$seed_file"
 [ "$fails" -eq 0 ] && echo "TODOS OS TESTES PASSARAM" || { echo "$fails teste(s) falharam"; exit 1; }

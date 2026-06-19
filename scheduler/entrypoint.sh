@@ -22,6 +22,17 @@ rotate_logs() {
   find "$DATA/logs" -name '*.log' -type f -mtime +"${LOG_RETENTION_DAYS:-30}" -delete 2>/dev/null || true
 }
 
+# O config do claude é o arquivo ~/.claude.json (no HOME), separado do diretório
+# montado ~/.claude. Ele é efêmero no container; sem ele o `claude -p` refaz o
+# init de primeira execução e às vezes trava no modo não-interativo. Semeia de um
+# seed read-only montado (config do host), só quando ainda não existe.
+seed_claude_config() {
+  local target="$HOME/.claude.json" seed="${CLAUDE_SEED:-/seed/claude.json}"
+  [ -f "$target" ] && return 0
+  [ -f "$seed" ] && cp "$seed" "$target"
+  return 0
+}
+
 seed_repo() {  # cria repo remoto + estrutura mínima (greenfield) — ver spec §6.1
   gh repo create "$REPO_SLUG" --private --confirm 2>/dev/null || true
   mkdir -p "$REPO/posts-queue"
@@ -39,6 +50,7 @@ main() {
   mkdir -p "$DATA/logs" "$DATA/out"
   rotate_logs
   setup_git
+  seed_claude_config
 
   case "$(bootstrap_state)" in
     ready) echo "[entrypoint] repo já presente em $REPO" ;;
