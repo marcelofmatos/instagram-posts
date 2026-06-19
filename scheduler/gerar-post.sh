@@ -16,9 +16,9 @@ MODEL="${MODEL:-sonnet}"
 REPO_SLUG="${REPO_SLUG:-marcelofmatos/instagram-posts}"
 WA_WEBHOOK="${WA_WEBHOOK:-}"
 WA_NUM="${WA_NUM:-}"
-# Template da arte: v3 (layout do v2 — chip/barra/pílula — + ícone temático de fundo).
+# Template da arte: v4 (layout do v2 — chip/barra/pílula — + foto de fundo por lâmina).
 # Configurável por env; o render.mjs lê POST_TEMPLATE.
-export POST_TEMPLATE="${POST_TEMPLATE:-template-v3.html}"
+export POST_TEMPLATE="${POST_TEMPLATE:-template-v4.html}"
 
 DRY=0
 TEMA=""
@@ -129,6 +129,30 @@ CAPTION="$(jq -r '.caption' "$OUT/meta.json")"
 while IFS= read -r t; do
   [ "${#t}" -le 70 ] || log "AVISO: título com ${#t} chars (>70) pode ficar ilegível: \"$t\""
 done < <(jq -r '.[].title' "$OUT/conteudo.json")
+
+# ===== 4.5 Buscar fotos ilustrativas (Pexels) — não-fatal; sem foto => emoji =====
+STEP="buscar fotos (pexels)"
+rm -f "$OUT"/img-*.jpg
+if [ -n "${PEXELS_API_KEY:-}" ]; then
+  for i in $(seq 1 "$NSLIDES"); do
+    ii="$(printf '%02d' "$i")"
+    q="$(jq -r ".[$((i-1))].query // empty" "$OUT/conteudo.json")"
+    [ -n "$q" ] || continue
+    qenc="$(jq -rn --arg q "$q" '$q|@uri')"
+    pexels_search() { curl -fsS -m 20 -H "Authorization: $PEXELS_API_KEY" \
+      "https://api.pexels.com/v1/search?orientation=portrait&per_page=1&query=$qenc"; }
+    resp="$(retry "pexels $ii" -- pexels_search 2>>"$LOG")" \
+      || { log "pexels: busca falhou ($ii); usando emoji"; continue; }
+    url="$(printf '%s' "$resp" | jq -r '.photos[0].src.portrait // .photos[0].src.large // empty')"
+    [ -n "$url" ] || { log "pexels: sem resultado p/ \"$q\" ($ii); usando emoji"; continue; }
+    pexels_dl() { curl -fsSL -m 30 "$url" -o "$OUT/img-$ii.jpg"; }
+    retry "pexels dl $ii" -- pexels_dl >>"$LOG" 2>&1 \
+      || { rm -f "$OUT/img-$ii.jpg"; log "pexels: download falhou ($ii); usando emoji"; }
+  done
+  log "fotos: $(find "$OUT" -name 'img-*.jpg' 2>/dev/null | wc -l)/$NSLIDES baixada(s)"
+else
+  log "PEXELS_API_KEY vazio; pulando fotos (usando emoji)"
+fi
 
 # ===== 5. Renderizar a arte =====
 STEP="renderizar arte"
