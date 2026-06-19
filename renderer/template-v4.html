@@ -56,7 +56,7 @@
      acima do emoji-fallback (z-0). O scrim escuro garante a legibilidade. */
   .photo{position:absolute;inset:0;z-index:1;background-size:cover;background-position:center}
   .scrim{position:absolute;inset:0;z-index:1;
-    background:linear-gradient(180deg,rgba(10,6,23,.35) 0%,rgba(10,6,23,.72) 55%,rgba(10,6,23,.93) 100%);}
+    background:linear-gradient(180deg,rgba(10,6,23,.52) 0%,rgba(10,6,23,.80) 55%,rgba(10,6,23,.95) 100%);}
 
   /* ===== Header ===== */
   .top{display:flex;align-items:flex-start;justify-content:space-between}
@@ -99,10 +99,15 @@
     line-height:1.03;letter-spacing:-1.5px;
     background:linear-gradient(96deg,var(--grad-a) 0%,var(--grad-b) 100%);
     -webkit-background-clip:text;background-clip:text;color:transparent;
+    /* v4: drop-shadow funciona com background-clip:text (segue o contorno dos
+       glifos) — destaca o título do gradiente sobre a foto. */
+    filter:drop-shadow(0 3px 14px rgba(0,0,0,.9));
   }
-  .body{font-size:42px;line-height:1.42;color:var(--corpo);margin-top:34px;max-width:840px}
+  .body{font-size:42px;line-height:1.42;color:var(--corpo);margin-top:34px;max-width:840px;
+    text-shadow:0 2px 8px rgba(0,0,0,.85)}
   .list{margin-top:40px;display:flex;flex-direction:column;gap:24px}
-  .list .item{display:flex;align-items:center;gap:22px;font-size:42px;color:var(--texto)}
+  .list .item{display:flex;align-items:center;gap:22px;font-size:42px;color:var(--texto);
+    text-shadow:0 2px 8px rgba(0,0,0,.85)}
   .list .item .ic{font-size:46px;line-height:1;width:56px;text-align:center}
   .list .item.step .ic{
     font-family:'Poppins',sans-serif;font-weight:800;font-size:34px;color:#fff;
