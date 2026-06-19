@@ -16,9 +16,9 @@ MODEL="${MODEL:-sonnet}"
 REPO_SLUG="${REPO_SLUG:-marcelofmatos/instagram-posts}"
 WA_WEBHOOK="${WA_WEBHOOK:-}"
 WA_NUM="${WA_NUM:-}"
-# Template da arte: v2 (eyebrow em chip, barra de acento, CTA em pílula), como no v1.
+# Template da arte: v3 (layout do v2 — chip/barra/pílula — + ícone temático de fundo).
 # Configurável por env; o render.mjs lê POST_TEMPLATE.
-export POST_TEMPLATE="${POST_TEMPLATE:-template-v2.html}"
+export POST_TEMPLATE="${POST_TEMPLATE:-template-v3.html}"
 
 DRY=0
 TEMA=""
@@ -85,6 +85,7 @@ retry "git sync" -- git_sync || abort "git sync falhou (working tree sujo?)"
 STEP="pilar/dedup"
 DOW="$(date +%u)"
 PILAR="$(pilar_do_dia "$DOW")"
+export POST_PILLAR="$PILAR"   # fallback de ícone de fundo no render.mjs (v3)
 SCHED="$(proximo_dia_util_0900 "$TODAY")"
 RECENTES="$(temas_recentes "$HIST" 10)"
 [ -z "$RECENTES" ] && RECENTES="(nenhum ainda)"
