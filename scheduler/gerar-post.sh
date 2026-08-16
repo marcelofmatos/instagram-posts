@@ -81,7 +81,7 @@ cd "$REPO"
 git_sync() { git checkout -q main && git pull --no-rebase --quiet origin main; }
 retry "git sync" -- git_sync || abort "git sync falhou (working tree sujo?)"
 
-# ===== 2. Pilar do dia + dedup =====
+# ===== 2. Pilar do dia + pauta + dedup =====
 STEP="pilar/dedup"
 DOW="$(date +%u)"
 PILAR="$(pilar_do_dia "$DOW")"
@@ -89,7 +89,17 @@ export POST_PILLAR="$PILAR"   # fallback de ícone de fundo no render.mjs (v3)
 SCHED="$(proximo_horario_publicacao)"
 RECENTES="$(temas_recentes "$HIST" 10)"
 [ -z "$RECENTES" ] && RECENTES="(nenhum ainda)"
-log "pilar=$PILAR scheduled_for=$SCHED tema=${TEMA:-livre}"
+
+TEMA_ID=""
+CASO_TXT="(nenhum — tema livre)"
+if [ -z "$TEMA" ]; then
+  EXCL_IDS="$(tema_ids_recentes "$HIST" "$PILAR" 6)"
+  PAUTA="$(escolher_tema "$SCH/pautas.json" "$PILAR" "$EXCL_IDS")" || abort "escolher_tema: nenhuma pauta cadastrada pro pilar $PILAR"
+  TEMA_ID="$(printf '%s' "$PAUTA" | jq -r '.id')"
+  TEMA="$(printf '%s' "$PAUTA" | jq -r '.gancho')"
+  CASO_TXT="$(printf '%s' "$PAUTA" | jq -r '.caso')"
+fi
+log "pilar=$PILAR scheduled_for=$SCHED tema_id=${TEMA_ID:-manual} tema=$TEMA"
 
 # ===== 3. Montar prompt e chamar o claude =====
 STEP="gerar conteúdo (claude)"
@@ -102,6 +112,7 @@ PROMPT="$(sed \
   "$SCH/prompt-criar-post.md")"
 PROMPT="${PROMPT/__RECENTES__/$RECENTES}"
 PROMPT="${PROMPT/__TEMA__/$TEMA_TXT}"
+PROMPT="${PROMPT/__CASO__/$CASO_TXT}"
 
 log "chamando claude -p ($MODEL)…"
 # Roda a partir de $OUT: o claude grava os arquivos no cwd, então o cwd precisa
@@ -242,8 +253,8 @@ PR_URL="$(retry "gh pr create" -- gh_pr)" || abort "gh pr create falhou"
 
 # ===== 11. Histórico + volta pra main =====
 STEP="histórico"
-jq -nc --arg d "$TODAY" --arg s "$SLUG" --arg p "$PILAR" --arg t "$TITLE" \
-  '{date:$d, slug:$s, pillar:$p, title:$t}' >> "$HIST"
+jq -nc --arg d "$TODAY" --arg s "$SLUG" --arg p "$PILAR" --arg t "$TITLE" --arg ti "$TEMA_ID" \
+  '{date:$d, slug:$s, pillar:$p, title:$t, tema_id:($ti | if . == "" then null else . end)}' >> "$HIST"
 git checkout -q main
 log "PR aberto: $PR_URL"
 
