@@ -17,6 +17,13 @@ check "pilar qui" "prova" "$(pilar_do_dia 4)"
 check "pilar sex" "dor" "$(pilar_do_dia 5)"
 check "pilar dom (fallback)" "dor" "$(pilar_do_dia 7)"
 
+# formato do dia — só quarta vira reels
+check "formato seg" "imagem" "$(formato_do_dia 1)"
+check "formato ter" "imagem" "$(formato_do_dia 2)"
+check "formato qua" "reels" "$(formato_do_dia 3)"
+check "formato qui" "imagem" "$(formato_do_dia 4)"
+check "formato sex" "imagem" "$(formato_do_dia 5)"
+
 # slugify (ascii — evita variação de locale no //TRANSLIT)
 check "slugify simples" "mitos-automacao-pme" "$(slugify 'Mitos Automacao PME')"
 check "slugify pontuação" "tres-coisas" "$(slugify 'Tres   Coisas!!!')"
