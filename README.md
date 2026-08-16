@@ -30,7 +30,8 @@ Além do banco fixo de 20 pautas (`scheduler/pautas.json`), o Marcelo pode colar
 que salvou no Instagram (guardados numa sala Matrix pessoal — não integrada automaticamente)
 diretamente numa sessão com o Claude. O fluxo, seguido interativamente:
 
-1. Pra cada link colado, checar `scheduler/historico-links-inspiracao.ndjson` — se já processado, pular.
+1. Pra cada link colado, checar `scheduler/historico-links-inspiracao.ndjson` (arquivo **local,
+   fora do git** — ver `.gitignore`) — se já processado, pular.
 2. Abrir o link (página pública do post) e ler legenda + imagem.
 3. Extrair só o **ângulo/insight** — nunca a frase ou o caso exato do post original. Se não der pra
    gerar algo honesto sem citar o original, descartar o link.
@@ -39,8 +40,9 @@ diretamente numa sessão com o Claude. O fluxo, seguido interativamente:
    mapear pra algo que ele já fez, ou uma reflexão genérica do nicho quando não mapear.
 5. Adicionar a pauta a `scheduler/pautas.json` e registrar `{date, url, pauta_id}` em
    `scheduler/historico-links-inspiracao.ndjson`.
-6. Commitar. A pauta nova entra automaticamente no rodízio existente (`escolher_tema`,
-   `scheduler/lib.sh`) — nenhuma mudança de código necessária.
+6. Commitar **só o `scheduler/pautas.json`** (o histórico de links fica de fora do repo público —
+   não expõe de quais contas/posts o Marcelo tira inspiração). A pauta nova entra automaticamente
+   no rodízio existente (`escolher_tema`, `scheduler/lib.sh`) — nenhuma mudança de código necessária.
 
 Ver spec: `docs/superpowers/specs/2026-08-16-pautas-inspiradas-salvos-design.md`.
 

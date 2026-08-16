@@ -6,3 +6,7 @@ ig_token
 .scheduler/
 .superpowers/
 .worktrees/
+
+# histórico de links de inspiração (Instagram) — dado local, não expor de
+# quais contas/posts o Marcelo tira inspiração num repo público
+scheduler/historico-links-inspiracao.ndjson
