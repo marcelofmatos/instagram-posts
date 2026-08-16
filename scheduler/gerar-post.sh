@@ -149,6 +149,10 @@ if [ "$FORMATO" = "reels" ]; then
   RTITLE="$(jq -r '.[0].title' "$OUT/conteudo.json")"
   [ "${#RTITLE}" -le 40 ] || abort "formato reels exige título ≤40 chars (recebeu ${#RTITLE}: \"$RTITLE\")"
 fi
+if [ "$FORMATO" = "reels" ]; then
+  jq -e '(.[0].body // "" | length) > 0' "$OUT/conteudo.json" >/dev/null \
+    || abort "formato reels exige campo 'body' preenchido na lâmina (recebeu bullets/steps ou body vazio)"
+fi
 jq -e 'has("slug") and has("pillar") and has("caption") and has("scheduled_for")' \
    "$OUT/meta.json" >/dev/null || abort "meta.json inválido"
 

@@ -1,15 +1,17 @@
 FROM node:20-bookworm-slim
 
 ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
     HOME=/home/app \
     REPO_DIR=/repo \
     DATA_DIR=/data \
     RENDERER_DIR=/app/renderer \
     SCHEDULER_DIR=/app/scheduler
 
-# Toolchain: git, jq, ImageMagick, Chromium headless, fontes (incl. emoji), gh, tzdata.
+# Toolchain: git, jq, ImageMagick, Chromium headless, ffmpeg (Reels), fontes (incl. emoji), gh, tzdata.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      ca-certificates curl gnupg git jq imagemagick chromium \
+      ca-certificates curl gnupg git jq imagemagick chromium ffmpeg \
       fontconfig fonts-noto-color-emoji tzdata \
  && mkdir -p -m 755 /etc/apt/keyrings \
  && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
