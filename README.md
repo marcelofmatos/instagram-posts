@@ -18,3 +18,8 @@ Tem uma tarefa manual consumindo o tempo da equipe? Fala comigo:
 - Instagram: [@marcelomatos.dev](https://instagram.com/marcelomatos.dev)
 - WhatsApp: [wa.me/5511977974431](https://wa.me/5511977974431?text=Quero%20meu%20diagn%C3%B3stico%20de%20automa%C3%A7%C3%A3o)
 
+---
+## Automação dos posts
+Os posts deste feed são gerados por uma stack Docker (v2). Ver
+[`docs/ARQUITETURA.md`](docs/ARQUITETURA.md).
+

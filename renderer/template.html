@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="fonts.css" />
+<style>
+  :root{
+    /* ===== Tokens da marca Marcelo Matos | Dev & IA ===== */
+    --bg:#0a0617;
+    --glow-roxo:#7b3aec;       /* glow superior-esquerdo */
+    --glow-ciano:#1d93b8;      /* glow superior-direito */
+    --marca-roxo:#7b3aec;      /* quadrado do logo */
+    --ciano:#2fcfe9;           /* eyebrow + CTA (contraste alto p/ thumbnail) */
+    --grad-a:#46a0f0;          /* início do gradiente do título (azul-ciano) */
+    --grad-b:#a85cf2;          /* fim do gradiente do título (roxo) */
+    --texto:#ffffff;
+    --corpo:#cdc8e6;           /* corpo: lavanda-claro (mais claro que o original p/ leitura no grid) */
+    --suave:#8d86a8;           /* handle / legendas discretas */
+    --linha:rgba(255,255,255,.16);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1080px;height:1350px}
+  .canvas{
+    position:relative;width:1080px;height:1350px;overflow:hidden;
+    background:
+      radial-gradient(120% 80% at 8% 0%, rgba(123,58,236,.42) 0%, rgba(123,58,236,0) 46%),
+      radial-gradient(110% 75% at 100% 4%, rgba(29,147,184,.40) 0%, rgba(29,147,184,0) 44%),
+      radial-gradient(90% 60% at 50% 108%, rgba(123,58,236,.30) 0%, rgba(123,58,236,0) 55%),
+      var(--bg);
+    color:var(--texto);
+    font-family:'Inter',sans-serif;
+    /* zona segura: o grid novo do IG usa célula 3:4 e corta ~34px de cada
+       lateral do 4:5. Padding lateral folgado (116px) mantém o texto principal
+       bem dentro da área visível, sem corte. */
+    padding:96px 116px 92px;
+    display:flex;flex-direction:column;
+  }
+  /* malha de fundo sutil */
+  .canvas::before{
+    content:"";position:absolute;inset:0;opacity:.05;pointer-events:none;
+    background-image:linear-gradient(var(--linha) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--linha) 1px,transparent 1px);
+    background-size:90px 90px;
+  }
+  .canvas>*{position:relative;z-index:1}
+
+  /* ===== Header ===== */
+  .top{display:flex;align-items:flex-start;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:22px}
+  .logo{
+    width:84px;height:84px;border-radius:22px;
+    background:linear-gradient(145deg,#8b4bff,#6a28d8);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 30px rgba(123,58,236,.45);
+  }
+  .logo span{font-family:'Poppins',sans-serif;font-weight:800;font-size:34px;color:#fff;letter-spacing:-1px}
+  .who .name{font-family:'Poppins',sans-serif;font-weight:800;font-size:38px;line-height:1.05}
+  .who .handle{font-size:26px;color:var(--suave);margin-top:4px}
+  .dots{display:flex;align-items:center;gap:14px;margin-top:34px}
+  .dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.26)}
+  .dot.on{background:var(--ciano);box-shadow:0 0 16px rgba(47,207,233,.7)}
+
+  /* ===== Corpo central ===== */
+  .mid{flex:1;display:flex;flex-direction:column;justify-content:center}
+  .eyebrow{
+    font-family:'Poppins',sans-serif;font-weight:700;font-size:30px;letter-spacing:4px;
+    text-transform:uppercase;color:var(--ciano);margin-bottom:30px;
+  }
+  .title{
+    font-family:'Poppins',sans-serif;font-weight:800;font-size:var(--title-size,96px);
+    line-height:1.04;letter-spacing:-1.5px;
+    background:linear-gradient(96deg,var(--grad-a) 0%,var(--grad-b) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .body{font-size:42px;line-height:1.42;color:var(--corpo);margin-top:34px;max-width:840px}
+  .list{margin-top:40px;display:flex;flex-direction:column;gap:24px}
+  .list .item{display:flex;align-items:center;gap:22px;font-size:42px;color:var(--texto)}
+  .list .item .ic{font-size:46px;line-height:1;width:56px;text-align:center}
+  .list .item.step .ic{
+    font-family:'Poppins',sans-serif;font-weight:800;font-size:34px;color:#fff;
+    width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(145deg,#8b4bff,#6a28d8);
+  }
+
+  /* ===== Footer ===== */
+  .foot{margin-top:40px}
+  .rule{height:2px;background:var(--linha);margin-bottom:30px}
+  .foot .row{display:flex;align-items:center;justify-content:space-between}
+  .foot .at{font-family:'Poppins',sans-serif;font-weight:700;font-size:34px;color:#fff}
+  .foot .cta{font-family:'Poppins',sans-serif;font-weight:700;font-size:32px;color:var(--ciano)}
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="top">
+      <div class="brand">
+        <div class="logo"><span>&lt;/&gt;</span></div>
+        <div class="who">
+          <div class="name">Marcelo Matos</div>
+          <div class="handle">marcelomatos.dev</div>
+        </div>
+      </div>
+      {{PROGRESS}}
+    </div>
+
+    <div class="mid">
+      <div class="eyebrow">{{EYEBROW}}</div>
+      <div class="title">{{TITLE}}</div>
+      {{CONTENT}}
+    </div>
+
+    <div class="foot">
+      <div class="rule"></div>
+      <div class="row">
+        <div class="at">@marcelomatos.dev</div>
+        <div class="cta">{{CTA}}</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
