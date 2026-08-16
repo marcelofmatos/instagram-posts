@@ -13,6 +13,16 @@ pilar_do_dia() {
   esac
 }
 
+# formato_do_dia <1..7>  -> "reels" na quarta (mesmo dia do pilar "educacao"),
+# "imagem" nos demais dias úteis. Fase 1 do Reels: 1x/semana, substitui um
+# post de imagem em vez de somar (não muda o total semanal).
+formato_do_dia() {
+  case "$1" in
+    3) echo "reels" ;;
+    *) echo "imagem" ;;
+  esac
+}
+
 # slugify <texto>  -> kebab-case ascii, só [a-z0-9-]
 slugify() {
   echo "$1" \
