@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="fonts.css" />
+<style>
+  :root{
+    --bg:#0a0617;
+    --ciano:#2fcfe9;
+    --grad-a:#46a0f0;
+    --grad-b:#a85cf2;
+    --texto:#ffffff;
+    --corpo:#e4e0f4;
+    --suave:#8d86a8;
+    --linha:rgba(255,255,255,.16);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1080px;height:1920px}
+  .canvas{
+    position:relative;width:1080px;height:1920px;overflow:hidden;
+    background:
+      radial-gradient(120% 60% at 8% 0%, rgba(123,58,236,.48) 0%, rgba(123,58,236,0) 46%),
+      radial-gradient(110% 55% at 100% 4%, rgba(29,147,184,.46) 0%, rgba(29,147,184,0) 44%),
+      radial-gradient(95% 45% at 50% 110%, rgba(123,58,236,.34) 0%, rgba(123,58,236,0) 55%),
+      var(--bg);
+    color:var(--texto);font-family:'Inter',sans-serif;
+    padding:110px 96px 120px;
+    display:flex;flex-direction:column;
+  }
+  .top{display:flex;align-items:center;gap:20px}
+  .logo{
+    width:72px;height:72px;border-radius:18px;
+    background:linear-gradient(145deg,#8b4bff,#6a28d8);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 30px rgba(123,58,236,.45);
+  }
+  .logo span{font-family:'Poppins',sans-serif;font-weight:800;font-size:28px;color:#fff;letter-spacing:-1px}
+  .handle{font-family:'Poppins',sans-serif;font-weight:700;font-size:30px;color:var(--suave)}
+
+  .mid{flex:1;display:flex;flex-direction:column;justify-content:center}
+  .eyebrow{
+    display:inline-flex;align-self:flex-start;
+    font-family:'Poppins',sans-serif;font-weight:700;font-size:32px;letter-spacing:3px;
+    text-transform:uppercase;color:var(--ciano);margin-bottom:36px;
+    padding:16px 30px;border-radius:999px;
+    border:2px solid rgba(47,207,233,.45);background:rgba(47,207,233,.10);
+  }
+  .title{
+    font-family:'Poppins',sans-serif;font-weight:800;font-size:84px;
+    line-height:1.08;letter-spacing:-1.5px;
+    background:linear-gradient(96deg,var(--grad-a) 0%,var(--grad-b) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .body{font-size:44px;line-height:1.45;color:var(--corpo);margin-top:44px;max-width:880px}
+
+  .foot{margin-top:40px}
+  .rule{height:2px;background:var(--linha);margin-bottom:34px}
+  .foot .row{display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .foot .at{font-family:'Poppins',sans-serif;font-weight:700;font-size:36px;color:#fff}
+  .foot .cta{
+    font-family:'Poppins',sans-serif;font-weight:800;font-size:32px;color:#07121a;
+    padding:20px 34px;border-radius:999px;white-space:nowrap;
+    background:linear-gradient(135deg,var(--ciano),var(--grad-a));
+    box-shadow:0 10px 26px rgba(47,207,233,.32);
+  }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="top">
+      <div class="logo"><span>&lt;/&gt;</span></div>
+      <div class="handle">marcelomatos.dev</div>
+    </div>
+    <div class="mid">
+      <div class="eyebrow" style="{{EYEBROW_STYLE}}">{{EYEBROW}}</div>
+      <div class="title" style="{{TITLE_STYLE}}">{{TITLE}}</div>
+      <div class="body" style="{{BODY_STYLE}}">{{BODY}}</div>
+    </div>
+    <div class="foot">
+      <div class="rule"></div>
+      <div class="row">
+        <div class="at">@marcelomatos.dev</div>
+        <div class="cta">{{CTA}}</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
