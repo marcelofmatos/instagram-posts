@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Renderiza um Reels de tipografia animada (1080x1920, ~5s, sem áudio) a
+// Renderiza um Reels de tipografia animada (1080x1920, ~7s, sem áudio) a
 // partir de UM slide { eyebrow, title, body, cta }.
 // Uso: node render-reels.mjs <slide.json> <out-dir>
 // Sempre grava em <out-dir>/post-01.mp4 (mesma convenção de nome fixo do
@@ -8,6 +8,7 @@ import { readFileSync, writeFileSync, mkdirSync, unlinkSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
+import { punchStyle, wipeStyle, revealStyle, splitLastWord } from './reels-timing.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const [slidePath, outDirArg] = process.argv.slice(2);
@@ -35,29 +36,33 @@ const baseHtml = template.replace(
 );
 
 const slide = JSON.parse(readFileSync(slidePath, 'utf8'));
+const { rest: titleRest, last: titleLast } = splitLastWord(slide.title);
 
 const FPS = 24;
-const ANIM_FRAMES = 47;         // ~1.96s de animação renderizada quadro a quadro
-const TOTAL_SECONDS = 5;
+// Timeline (em frames, 24fps): eyebrow entra em "punch" -> título varre em
+// "wipe" -> palavra de destaque pousa em "punch" -> corpo revela -> CTA
+// pousa em "punch" (o "beat que aterrissa" no fim da animação).
+const EYEBROW = { start: 0, dur: 12 };
+const TITLE = { start: 8, dur: 24 };
+const TITLE_HL = { start: 30, dur: 18 };
+const BODY = { start: 44, dur: 22 };
+const CTA = { start: 62, dur: 22 };
+const ANIM_FRAMES = 90;          // ~3.75s de animação renderizada quadro a quadro
+const TOTAL_SECONDS = 7;         // dentro da faixa 7-15s de maior taxa de conclusão
 const HOLD_SECONDS = +(TOTAL_SECONDS - ANIM_FRAMES / FPS).toFixed(3);
-
-// Entrada em 3 estágios (eyebrow -> título -> corpo), cada um com easeOutQuad.
-const easeOutQuad = t => 1 - (1 - t) * (1 - t);
-function reveal(frame, startFrame, durationFrames) {
-  const t = Math.min(1, Math.max(0, (frame - startFrame) / durationFrames));
-  const e = easeOutQuad(t);
-  return `opacity:${e.toFixed(3)};transform:translateY(${Math.round((1 - e) * 40)}px)`;
-}
 
 for (let frame = 0; frame < ANIM_FRAMES; frame++) {
   const html = baseHtml
     .replace('{{EYEBROW}}', esc(slide.eyebrow || ''))
-    .replace('{{TITLE}}', esc(slide.title || ''))
+    .replace('{{TITLE_REST}}', esc(titleRest))
+    .replace('{{TITLE_LAST}}', esc(titleLast))
     .replace('{{BODY}}', esc(slide.body || ''))
     .replace('{{CTA}}', esc(slide.cta || 'WhatsApp na bio →'))
-    .replace('{{EYEBROW_STYLE}}', reveal(frame, 0, 14))
-    .replace('{{TITLE_STYLE}}', reveal(frame, 10, 20))
-    .replace('{{BODY_STYLE}}', reveal(frame, 26, 20));
+    .replace('{{EYEBROW_STYLE}}', punchStyle(frame, EYEBROW.start, EYEBROW.dur))
+    .replace('{{TITLE_STYLE}}', wipeStyle(frame, TITLE.start, TITLE.dur))
+    .replace('{{TITLE_HL_STYLE}}', punchStyle(frame, TITLE_HL.start, TITLE_HL.dur))
+    .replace('{{BODY_STYLE}}', revealStyle(frame, BODY.start, BODY.dur))
+    .replace('{{CTA_STYLE}}', punchStyle(frame, CTA.start, CTA.dur));
 
   const num = String(frame).padStart(3, '0');
   const htmlPath = join(outDir, `reels-frame-${num}.html`);
@@ -74,11 +79,17 @@ for (let frame = 0; frame < ANIM_FRAMES; frame++) {
   unlinkSync(htmlPath);
 }
 
+// Zoom lento e contínuo (tipo Ken Burns) aplicado ao vídeo INTEIRO — inclusive
+// no trecho "hold" clonado do último frame — pra nunca ficar com imagem
+// parada na tela (era o principal motivo do reels anterior parecer estático).
+const ZOOM_MAX = 1.08;
+const zoompan = `zoompan=z='min(${ZOOM_MAX},1+0.00055*on)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=${FPS}`;
+
 const mp4Path = join(outDir, 'post-01.mp4');
 execFileSync('ffmpeg', [
   '-y', '-framerate', String(FPS),
   '-i', join(outDir, 'reels-frame-%03d.png'),
-  '-vf', `tpad=stop_mode=clone:stop_duration=${HOLD_SECONDS},format=yuv420p`,
+  '-vf', `tpad=stop_mode=clone:stop_duration=${HOLD_SECONDS},${zoompan},format=yuv420p`,
   '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
   mp4Path,
 ], { stdio: ['ignore', 'ignore', 'inherit'] });
