@@ -12,42 +12,62 @@
     --texto:#ffffff;
     --corpo:#e4e0f4;
     --suave:#8d86a8;
-    --linha:rgba(255,255,255,.16);
+    --linha:rgba(255,255,255,.28);
+    --mono:'DejaVu Sans Mono',monospace;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{width:1080px;height:1920px}
   .canvas{
     position:relative;width:1080px;height:1920px;overflow:hidden;
     background:
-      radial-gradient(120% 60% at 8% 0%, rgba(123,58,236,.48) 0%, rgba(123,58,236,0) 46%),
-      radial-gradient(110% 55% at 100% 4%, rgba(29,147,184,.46) 0%, rgba(29,147,184,0) 44%),
-      radial-gradient(95% 45% at 50% 110%, rgba(123,58,236,.34) 0%, rgba(123,58,236,0) 55%),
+      radial-gradient(120% 60% at 8% 0%, rgba(123,58,236,.40) 0%, rgba(123,58,236,0) 46%),
+      radial-gradient(110% 55% at 100% 4%, rgba(29,147,184,.40) 0%, rgba(29,147,184,0) 44%),
       var(--bg);
     color:var(--texto);font-family:'Inter',sans-serif;
-    padding:110px 96px 120px;
+    padding:64px;
+  }
+  .canvas::before{
+    content:"";position:absolute;inset:0;opacity:.06;pointer-events:none;
+    background-image:linear-gradient(var(--linha) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--linha) 1px,transparent 1px);
+    background-size:60px 60px;
+  }
+  .frame{
+    position:relative;z-index:2;width:100%;height:100%;
+    border:2px solid var(--linha);
     display:flex;flex-direction:column;
   }
-  .top{display:flex;align-items:center;gap:20px}
-  .logo{
-    width:72px;height:72px;border-radius:18px;
-    background:linear-gradient(145deg,#8b4bff,#6a28d8);
-    display:flex;align-items:center;justify-content:center;
-    box-shadow:0 10px 30px rgba(123,58,236,.45);
-  }
-  .logo span{font-family:'Poppins',sans-serif;font-weight:800;font-size:28px;color:#fff;letter-spacing:-1px}
-  .handle{font-family:'Poppins',sans-serif;font-weight:700;font-size:30px;color:var(--suave)}
+  .corner{position:absolute;width:34px;height:34px;border-color:var(--ciano);z-index:3}
+  .corner.tl{top:-2px;left:-2px;border-top:4px solid;border-left:4px solid}
+  .corner.tr{top:-2px;right:-2px;border-top:4px solid;border-right:4px solid}
+  .corner.bl{bottom:-2px;left:-2px;border-bottom:4px solid;border-left:4px solid}
+  .corner.br{bottom:-2px;right:-2px;border-bottom:4px solid;border-right:4px solid}
 
-  .mid{flex:1;display:flex;flex-direction:column;justify-content:center}
-  .eyebrow{
-    display:inline-flex;align-self:flex-start;
-    font-family:'Poppins',sans-serif;font-weight:700;font-size:32px;letter-spacing:3px;
-    text-transform:uppercase;color:var(--ciano);margin-bottom:36px;
-    padding:16px 30px;border-radius:999px;
-    border:2px solid rgba(47,207,233,.45);background:rgba(47,207,233,.10);
+  .winbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:26px 34px;border-bottom:2px solid var(--linha);
   }
+  .brand{display:flex;align-items:center;gap:20px}
+  .logo{
+    width:60px;height:60px;border:2px solid var(--texto);background:#000;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .logo span{font-family:var(--mono);font-weight:700;font-size:26px;color:var(--ciano)}
+  .path{font-family:var(--mono);font-size:26px;color:var(--suave)}
+  .path b{color:var(--texto)}
+  .dots{display:flex;gap:10px}
+  .dots i{width:16px;height:16px;border:2px solid var(--linha);font-style:normal}
+
+  .mid{flex:1;display:flex;flex-direction:column;justify-content:center;padding:80px 60px}
+  .eyebrow{
+    font-family:var(--mono);font-weight:700;font-size:32px;
+    color:var(--ciano);margin-bottom:34px;display:flex;align-items:center;gap:2px;
+  }
+  .eyebrow::before{content:"$ ";color:var(--suave)}
+  .eyebrow .cursor{display:inline-block;width:18px;height:38px;background:var(--ciano);margin-left:8px}
   .title{
-    font-family:'Poppins',sans-serif;font-weight:800;font-size:84px;
-    line-height:1.08;letter-spacing:-1.5px;
+    font-family:'Poppins',sans-serif;font-weight:800;font-size:82px;
+    line-height:1.05;letter-spacing:-1.5px;
   }
   /* .grad fica num <span> à parte (irmão do .hl, não ancestral): o Chromium
      "fantasma"/duplica o texto quando um elemento com transform (o .hl,
@@ -58,37 +78,44 @@
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
   .title .hl{display:inline-block;color:var(--ciano)}
-  .body{font-size:44px;line-height:1.45;color:var(--corpo);margin-top:44px;max-width:880px}
+  .body{font-family:var(--mono);font-size:36px;line-height:1.6;color:var(--corpo);
+    margin-top:40px;max-width:880px;border-left:3px solid var(--ciano);padding-left:26px}
 
-  .foot{margin-top:40px}
-  .rule{height:2px;background:var(--linha);margin-bottom:34px}
+  .foot{padding:34px;border-top:2px solid var(--linha)}
   .foot .row{display:flex;align-items:center;justify-content:space-between;gap:24px}
-  .foot .at{font-family:'Poppins',sans-serif;font-weight:700;font-size:36px;color:#fff}
+  .foot .at{font-family:var(--mono);font-size:30px;color:var(--suave)}
+  .foot .at b{color:var(--texto)}
   .foot .cta{
-    font-family:'Poppins',sans-serif;font-weight:800;font-size:32px;color:#07121a;
-    padding:20px 34px;border-radius:999px;white-space:nowrap;
-    background:linear-gradient(135deg,var(--ciano),var(--grad-a));
-    box-shadow:0 10px 26px rgba(47,207,233,.32);
-    display:inline-block;
+    font-family:var(--mono);font-weight:700;font-size:30px;color:#07121a;
+    text-transform:uppercase;
+    padding:18px 30px;white-space:nowrap;background:var(--ciano);
   }
+  .foot .cta::before{content:"[ "}
+  .foot .cta::after{content:" ]"}
 </style>
 </head>
 <body>
   <div class="canvas">
-    <div class="top">
-      <div class="logo"><span>&lt;/&gt;</span></div>
-      <div class="handle">marcelomatos.dev</div>
-    </div>
-    <div class="mid">
-      <div class="eyebrow" style="{{EYEBROW_STYLE}}">{{EYEBROW}}</div>
-      <div class="title" style="{{TITLE_STYLE}}"><span class="grad">{{TITLE_REST}} </span><span class="hl" style="{{TITLE_HL_STYLE}}">{{TITLE_LAST}}</span></div>
-      <div class="body" style="{{BODY_STYLE}}">{{BODY}}</div>
-    </div>
-    <div class="foot">
-      <div class="rule"></div>
-      <div class="row">
-        <div class="at">@marcelomatos.dev</div>
-        <div class="cta" style="{{CTA_STYLE}}">{{CTA}}</div>
+    <div class="frame">
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+      <div class="winbar">
+        <div class="brand">
+          <div class="logo"><span>&lt;/&gt;</span></div>
+          <div class="path"><b>marcelomatos</b>/reels.mp4</div>
+        </div>
+        <div class="dots"><i></i><i></i><i></i></div>
+      </div>
+      <div class="mid">
+        <div class="eyebrow" style="{{EYEBROW_STYLE}}">{{EYEBROW}}<span class="cursor"></span></div>
+        <div class="title" style="{{TITLE_STYLE}}"><span class="grad">{{TITLE_REST}} </span><span class="hl" style="{{TITLE_HL_STYLE}}">{{TITLE_LAST}}</span></div>
+        <div class="body" style="{{BODY_STYLE}}">{{BODY}}</div>
+      </div>
+      <div class="foot">
+        <div class="row">
+          <div class="at">@<b>marcelomatos.dev</b></div>
+          <div class="cta" style="{{CTA_STYLE}}">{{CTA}}</div>
+        </div>
       </div>
     </div>
   </div>
