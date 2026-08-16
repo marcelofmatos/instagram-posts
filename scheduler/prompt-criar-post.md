@@ -31,8 +31,11 @@ Curtida não move o alcance; **salvar, comentar e compartilhar** movem. Por isso
 ## Pilar-alvo de hoje
 __PILAR__
 
-## Tema sugerido (se houver)
+## Tema de hoje (pauta fixa — desenvolva EM CIMA dela, não fuja pra outro assunto)
 __TEMA__
+
+## Caso real pra amarrar (use como prova/exemplo concreto, sem inventar números)
+__CASO__
 
 ## NÃO repita estes temas recentes
 __RECENTES__
