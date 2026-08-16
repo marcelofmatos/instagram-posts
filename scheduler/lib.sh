@@ -60,3 +60,32 @@ retry() {
     n=$((n + 1))
   done
 }
+
+# tema_ids_recentes <historico.ndjson> <pilar> <n>  -> ids de tema (campo
+# tema_id) usados nas entradas do mesmo pilar, uma por linha. Usado pra
+# excluir da próxima escolha e nunca repetir a pauta imediatamente anterior
+# do mesmo pilar.
+tema_ids_recentes() {
+  local arq="$1" pilar="$2" n="${3:-6}"
+  [ -f "$arq" ] || return 0
+  jq -rc --arg p "$pilar" 'select(.pillar == $p) | .tema_id // empty' "$arq" 2>/dev/null | tail -n "$n" || true
+}
+
+# escolher_tema <pautas.json> <pilar> <ids_excluidos (uma por linha)>
+# -> objeto JSON da pauta escolhida. rc=1 se não houver NENHUMA pauta pro
+# pilar. Se os excluídos esgotarem as opções do pilar, reaproveita o banco
+# inteiro daquele pilar (nunca falha só por causa do rodízio).
+escolher_tema() {
+  local arq="$1" pilar="$2" excluidos="$3" excl_json disponiveis n idx
+  excl_json="$(printf '%s\n' "$excluidos" | jq -R . | jq -sc 'map(select(length>0))')"
+  disponiveis="$(jq -c --arg p "$pilar" --argjson ex "$excl_json" \
+    '[.[] | select(.pilar == $p) | select(([.id] - $ex) == [.id])]' "$arq")"
+  n="$(printf '%s' "$disponiveis" | jq 'length')"
+  if [ "$n" -eq 0 ]; then
+    disponiveis="$(jq -c --arg p "$pilar" '[.[] | select(.pilar == $p)]' "$arq")"
+    n="$(printf '%s' "$disponiveis" | jq 'length')"
+  fi
+  [ "$n" -gt 0 ] || return 1
+  idx=$((RANDOM % n))
+  printf '%s' "$disponiveis" | jq -c --argjson i "$idx" '.[$i]'
+}

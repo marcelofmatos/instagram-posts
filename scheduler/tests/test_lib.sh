@@ -43,4 +43,30 @@ RETRY_MAX=2 RETRY_BASE_SECONDS=0 retry "fail" -- always_fail
 rc=$?
 check "retry esgota (rc≠0)" "1:2" "$([ "$rc" -ne 0 ] && echo 1 || echo 0):$attempts"
 
+# tema_ids_recentes — filtra por pilar, mais antigo primeiro no arquivo
+tmp_hist="$(mktemp)"
+cat > "$tmp_hist" <<'NDJSON'
+{"date":"2026-08-01","pillar":"prova","tema_id":"a"}
+{"date":"2026-08-02","pillar":"dor","tema_id":"c"}
+{"date":"2026-08-03","pillar":"prova","tema_id":"b"}
+NDJSON
+check "tema_ids_recentes filtra por pilar" "$(printf 'a\nb')" "$(tema_ids_recentes "$tmp_hist" "prova" 5)"
+check "tema_ids_recentes arquivo ausente -> vazio" "" "$(tema_ids_recentes "/tmp/nao-existe-$$.ndjson" "prova" 5)"
+rm -f "$tmp_hist"
+
+# escolher_tema — fixture com 3 pautas em 2 pilares
+tmp_pautas="$(mktemp)"
+cat > "$tmp_pautas" <<'JSON'
+[
+  {"id":"a","pilar":"prova","tema":"infra","gancho":"g-a","caso":"c-a"},
+  {"id":"b","pilar":"prova","tema":"automacao","gancho":"g-b","caso":"c-b"},
+  {"id":"c","pilar":"dor","tema":"automacao","gancho":"g-c","caso":"c-c"}
+]
+JSON
+check "escolher_tema filtra pelo pilar certo" "prova" "$(escolher_tema "$tmp_pautas" "prova" "" | jq -r '.pilar')"
+check "escolher_tema exclui id indicado (sobra só 'b')" "b" "$(escolher_tema "$tmp_pautas" "prova" "a" | jq -r '.id')"
+check "escolher_tema sem pauta pro pilar -> falha (rc=1)" "1" "$(escolher_tema "$tmp_pautas" "educacao" "" >/dev/null 2>&1; echo $?)"
+check "escolher_tema com todos excluídos -> reaproveita o banco (não falha)" "0" "$(escolher_tema "$tmp_pautas" "prova" "$(printf 'a\nb')" >/dev/null 2>&1; echo $?)"
+rm -f "$tmp_pautas"
+
 [ "$fails" -eq 0 ] && echo "TODOS OS TESTES PASSARAM" || { echo "$fails teste(s) falharam"; exit 1; }
