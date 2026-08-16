@@ -4,11 +4,12 @@
 // Uso: node render-reels.mjs <slide.json> <out-dir>
 // Sempre grava em <out-dir>/post-01.mp4 (mesma convenção de nome fixo do
 // render.mjs — o slug final é aplicado depois, no gerar-post.sh).
-import { readFileSync, writeFileSync, mkdirSync, unlinkSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, unlinkSync, readdirSync, renameSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { punchStyle, wipeStyle, revealStyle, splitLastWord } from './reels-timing.mjs';
+import { pickFile, pickStartOffset } from './reels-audio.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const [slidePath, outDirArg] = process.argv.slice(2);
@@ -97,4 +98,37 @@ execFileSync('ffmpeg', [
 for (let frame = 0; frame < ANIM_FRAMES; frame++) {
   unlinkSync(join(outDir, `reels-frame-${String(frame).padStart(3, '0')}.png`));
 }
+
+// ===== Trilha de fundo (opcional; não-fatal) =====
+// Sorteia um mp3 de renderer/audio/ e um trecho aleatório do tamanho do
+// vídeo, com fade-out no último segundo. Sem faixas na pasta -> reels mudo.
+try {
+  const audioDir = join(__dir, 'audio');
+  const audioFiles = readdirSync(audioDir).filter(f => f.endsWith('.mp3'));
+  const track = pickFile(audioFiles);
+  if (track) {
+    const trackPath = join(audioDir, track);
+    const trackDuration = parseFloat(execFileSync('ffprobe', [
+      '-v', 'error', '-show_entries', 'format=duration',
+      '-of', 'default=noprint_wrappers=1:nokey=1', trackPath,
+    ]).toString().trim()) || TOTAL_SECONDS;
+    const startAt = pickStartOffset(trackDuration, TOTAL_SECONDS);
+    const withAudio = join(outDir, 'post-01-audio.mp4');
+    execFileSync('ffmpeg', [
+      '-y', '-i', mp4Path,
+      '-ss', String(startAt), '-t', String(TOTAL_SECONDS), '-i', trackPath,
+      '-filter_complex', `[1:a]volume=0.85,afade=t=out:st=${TOTAL_SECONDS - 1}:d=1[a]`,
+      '-map', '0:v', '-map', '[a]',
+      '-c:v', 'copy', '-c:a', 'aac', '-b:a', '128k', '-shortest',
+      withAudio,
+    ], { stdio: ['ignore', 'ignore', 'inherit'] });
+    renameSync(withAudio, mp4Path);
+    console.log(`✓ trilha: ${track} (${startAt}s-${(startAt + TOTAL_SECONDS).toFixed(1)}s)`);
+  } else {
+    console.log('sem trilha em renderer/audio/; reels fica mudo');
+  }
+} catch (err) {
+  console.error(`AVISO: trilha de fundo falhou (${err.message}); reels segue mudo`);
+}
+
 console.log(`✓ ${mp4Path}`);
