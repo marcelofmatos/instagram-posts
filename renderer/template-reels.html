@@ -48,9 +48,16 @@
   .title{
     font-family:'Poppins',sans-serif;font-weight:800;font-size:84px;
     line-height:1.08;letter-spacing:-1.5px;
+  }
+  /* .grad fica num <span> à parte (irmão do .hl, não ancestral): o Chromium
+     "fantasma"/duplica o texto quando um elemento com transform (o .hl,
+     animado em punch) é filho de um elemento com -webkit-background-clip:text
+     — bug de composição de camadas confirmado em teste isolado. */
+  .title .grad{
     background:linear-gradient(96deg,var(--grad-a) 0%,var(--grad-b) 100%);
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
+  .title .hl{display:inline-block;color:var(--ciano)}
   .body{font-size:44px;line-height:1.45;color:var(--corpo);margin-top:44px;max-width:880px}
 
   .foot{margin-top:40px}
@@ -62,6 +69,7 @@
     padding:20px 34px;border-radius:999px;white-space:nowrap;
     background:linear-gradient(135deg,var(--ciano),var(--grad-a));
     box-shadow:0 10px 26px rgba(47,207,233,.32);
+    display:inline-block;
   }
 </style>
 </head>
@@ -73,14 +81,14 @@
     </div>
     <div class="mid">
       <div class="eyebrow" style="{{EYEBROW_STYLE}}">{{EYEBROW}}</div>
-      <div class="title" style="{{TITLE_STYLE}}">{{TITLE}}</div>
+      <div class="title" style="{{TITLE_STYLE}}"><span class="grad">{{TITLE_REST}} </span><span class="hl" style="{{TITLE_HL_STYLE}}">{{TITLE_LAST}}</span></div>
       <div class="body" style="{{BODY_STYLE}}">{{BODY}}</div>
     </div>
     <div class="foot">
       <div class="rule"></div>
       <div class="row">
         <div class="at">@marcelomatos.dev</div>
-        <div class="cta">{{CTA}}</div>
+        <div class="cta" style="{{CTA_STYLE}}">{{CTA}}</div>
       </div>
     </div>
   </div>
