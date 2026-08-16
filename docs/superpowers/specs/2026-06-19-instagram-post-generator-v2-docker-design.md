@@ -250,8 +250,8 @@ LOG_RETENTION_DAYS=30
 BOOTSTRAP_INIT=0
 ```
 
-> **Nota sobre identidade git:** a working tree local hoje usa
-> `[e-mail removido]`. A regra global do usuário define a identidade canônica
+> **Nota sobre identidade git:** a working tree local pode estar com um e-mail
+> pessoal configurado. A regra global do usuário define a identidade canônica
 > como `Marcelo Matos <contato@marcelomatos.dev>` — adotada como **default** aqui e
 > configurável via env. O e-mail da conta Claude **nunca** é usado como autor/committer.
 
