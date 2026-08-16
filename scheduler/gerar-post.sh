@@ -83,8 +83,10 @@ retry "git sync" -- git_sync || abort "git sync falhou (working tree sujo?)"
 
 # ===== 2. Pilar do dia + pauta + dedup =====
 STEP="pilar/dedup"
-DOW="$(date +%u)"
+DOW="${DOW_OVERRIDE:-$(date +%u)}"
 PILAR="$(pilar_do_dia "$DOW")"
+# FORMATO = "imagem"|"reels" (flag de máquina); não confundir com FORMATO_LABEL (texto pro PR/WhatsApp)
+FORMATO="$(formato_do_dia "$DOW")"
 export POST_PILLAR="$PILAR"   # fallback de ícone de fundo no render.mjs (v3)
 SCHED="$(proximo_horario_publicacao)"
 RECENTES="$(temas_recentes "$HIST" 10)"
@@ -99,12 +101,20 @@ if [ -z "$TEMA" ]; then
   TEMA="$(printf '%s' "$PAUTA" | jq -r '.gancho')"
   CASO_TXT="$(printf '%s' "$PAUTA" | jq -r '.caso')"
 fi
-log "pilar=$PILAR scheduled_for=$SCHED tema_id=${TEMA_ID:-manual} tema=$TEMA"
+log "pilar=$PILAR scheduled_for=$SCHED tema_id=${TEMA_ID:-manual} tema=$TEMA formato=$FORMATO"
 
 # ===== 3. Montar prompt e chamar o claude =====
 STEP="gerar conteúdo (claude)"
 rm -f "$OUT/conteudo.json" "$OUT/meta.json"
 TEMA_TXT="${TEMA:-"(livre — pesquise e escolha o melhor ângulo do nicho para o pilar de hoje)"}"
+if [ "$FORMATO" = "reels" ]; then
+  FORMATO_INSTRUCAO="Gere **exatamente 1 lâmina** (sem carrossel) — este post vira um Reels de tipografia animada. Título BEM curto (até 40 caracteres, cabe em 1-2 linhas grandes na tela); 1 ideia forte só; body opcional e curto (1 frase)."
+else
+  FORMATO_INSTRUCAO="Decida pelo tema/pilar:
+- **Imagem única** (1 lâmina): mensagem direta, 1 ideia.
+- **Carrossel (3 a 6 lâminas)**: quando o tema rende sequência — passo a passo, lista, antes/depois, mito x verdade.
+  Narrativa: **lâmina 1 = capa/gancho**; lâminas do meio = valor; **última lâmina = CTA** (WhatsApp)."
+fi
 PROMPT="$(sed \
   -e "s|__PILAR__|$PILAR|g" \
   -e "s|__SCHEDULED_FOR__|$SCHED|g" \
@@ -113,6 +123,7 @@ PROMPT="$(sed \
 PROMPT="${PROMPT/__RECENTES__/$RECENTES}"
 PROMPT="${PROMPT/__TEMA__/$TEMA_TXT}"
 PROMPT="${PROMPT/__CASO__/$CASO_TXT}"
+PROMPT="${PROMPT/__FORMATO_INSTRUCAO__/$FORMATO_INSTRUCAO}"
 
 log "chamando claude -p ($MODEL)…"
 # Roda a partir de $OUT: o claude grava os arquivos no cwd, então o cwd precisa
@@ -131,6 +142,13 @@ jq -e 'type=="array" and ((length==1) or (length>=3 and length<=6)) and all(.[];
    "$OUT/conteudo.json" >/dev/null || abort "conteudo.json inválido (1 ou 3-6 lâminas, cada uma com num/eyebrow/title)"
 NSLIDES="$(jq 'length' "$OUT/conteudo.json")"
 log "lâminas=$NSLIDES ($([ "$NSLIDES" -eq 1 ] && echo 'imagem única' || echo 'carrossel'))"
+if [ "$FORMATO" = "reels" ] && [ "$NSLIDES" -ne 1 ]; then
+  abort "formato reels exige exatamente 1 lâmina (recebeu $NSLIDES)"
+fi
+if [ "$FORMATO" = "reels" ]; then
+  RTITLE="$(jq -r '.[0].title' "$OUT/conteudo.json")"
+  [ "${#RTITLE}" -le 40 ] || abort "formato reels exige título ≤40 chars (recebeu ${#RTITLE}: \"$RTITLE\")"
+fi
 jq -e 'has("slug") and has("pillar") and has("caption") and has("scheduled_for")' \
    "$OUT/meta.json" >/dev/null || abort "meta.json inválido"
 
@@ -167,15 +185,21 @@ fi
 
 # ===== 5. Renderizar a arte =====
 STEP="renderizar arte"
-node "$RENDERER/render.mjs" "$OUT/conteudo.json" "$OUT" >>"$LOG" 2>&1 || abort "render.mjs falhou"
-for i in $(seq 1 "$NSLIDES"); do
-  ii="$(printf '%02d' "$i")"
-  [ -f "$OUT/post-$ii.png" ] || abort "render não produziu post-$ii.png"
-done
+if [ "$FORMATO" = "reels" ]; then
+  jq '.[0]' "$OUT/conteudo.json" > "$OUT/slide.json"
+  node "$RENDERER/render-reels.mjs" "$OUT/slide.json" "$OUT" >>"$LOG" 2>&1 || abort "render-reels.mjs falhou"
+  [ -f "$OUT/post-01.mp4" ] || abort "render não produziu post-01.mp4"
+else
+  node "$RENDERER/render.mjs" "$OUT/conteudo.json" "$OUT" >>"$LOG" 2>&1 || abort "render.mjs falhou"
+  for i in $(seq 1 "$NSLIDES"); do
+    ii="$(printf '%02d' "$i")"
+    [ -f "$OUT/post-$ii.png" ] || abort "render não produziu post-$ii.png"
+  done
+fi
 
 # ===== 6. Thumbnails =====
 STEP="thumbnails"
-if command -v convert >/dev/null; then
+if [ "$FORMATO" != "reels" ] && command -v convert >/dev/null; then
   for i in $(seq 1 "$NSLIDES"); do
     ii="$(printf '%02d' "$i")"
     convert "$OUT/post-$ii.png" -resize 360x "$OUT/thumb-$ii.png" 2>>"$LOG" || true
@@ -203,12 +227,25 @@ build_images() {  # popula IMAGES e copia post-0i.png -> nome final em "$1"
 }
 images_json() { printf '%s\n' "${IMAGES[@]}" | jq -R . | jq -s .; }
 
+build_video() {  # popula VIDEO com o nome final em "$1"
+  local dest="$1"
+  cp "$OUT/post-01.mp4" "$dest/$SLUG.mp4"; VIDEO="$SLUG.mp4"
+}
+build_manifest() {  # $1 = caminho de saída do manifesto; usa $FORMATO/$IMAGES/$VIDEO
+  if [ "$FORMATO" = "reels" ]; then
+    jq -n --arg sf "$SCHED" --arg p "$PILAR" --arg c "$CAPTION" --arg v "$VIDEO" \
+      '{scheduled_for:$sf, pillar:$p, caption:$c, media_type:"reels", video:$v}' > "$1"
+  else
+    jq -n --arg sf "$SCHED" --arg p "$PILAR" --arg c "$CAPTION" --argjson imgs "$(images_json)" \
+      '{scheduled_for:$sf, pillar:$p, caption:$c, images:$imgs}' > "$1"
+  fi
+}
+
 # ===== 8. Dry-run: para aqui (sem branch/PR) =====
 if [ "$DRY" -eq 1 ]; then
-  build_images "$OUT"
-  jq -n --arg sf "$SCHED" --arg p "$PILAR" --arg c "$CAPTION" --argjson imgs "$(images_json)" \
-    '{scheduled_for:$sf, pillar:$p, caption:$c, images:$imgs}' > "$OUT/$SLUG.json"
-  log "DRY: $NSLIDES lâmina(s); manifesto em $OUT/$SLUG.json; imagens em $OUT/ (sem branch/PR)."
+  if [ "$FORMATO" = "reels" ]; then build_video "$OUT"; else build_images "$OUT"; fi
+  build_manifest "$OUT/$SLUG.json"
+  log "DRY: formato=$FORMATO; manifesto em $OUT/$SLUG.json; mídia em $OUT/ (sem branch/PR)."
   log "=== fim (dry) ==="
   exit 0
 fi
@@ -217,25 +254,33 @@ fi
 STEP="branch + push"
 BRANCH="post/$SLUG"
 git checkout -q -b "$BRANCH" || abort "não consegui criar a branch $BRANCH"
-build_images "$QUEUE"
-jq -n --arg sf "$SCHED" --arg p "$PILAR" --arg c "$CAPTION" --argjson imgs "$(images_json)" \
-  '{scheduled_for:$sf, pillar:$p, caption:$c, images:$imgs}' > "$QUEUE/$SLUG.json"
+if [ "$FORMATO" = "reels" ]; then build_video "$QUEUE"; else build_images "$QUEUE"; fi
+build_manifest "$QUEUE/$SLUG.json"
 git add "$QUEUE/$SLUG.json"
-for img in "${IMAGES[@]}"; do git add "$QUEUE/$img"; done
-git commit -q -m "post: $SLUG ($PILAR, $NSLIDES lâmina(s))"
+if [ "$FORMATO" = "reels" ]; then
+  git add "$QUEUE/$VIDEO"
+else
+  for img in "${IMAGES[@]}"; do git add "$QUEUE/$img"; done
+fi
+git commit -q -m "post: $SLUG ($PILAR, $FORMATO)"
 git_push() { git push -q -u origin "$BRANCH"; }
 retry "git push" -- git_push || abort "git push da branch falhou"
 
 # ===== 10. Abrir o Pull Request =====
 STEP="abrir PR"
-IMGMD=""
-for img in "${IMAGES[@]}"; do
-  IMGMD="$IMGMD![${img}](https://raw.githubusercontent.com/$REPO_SLUG/$BRANCH/posts-queue/$img)"$'\n'
-done
-FORMATO="imagem única"; [ "$NSLIDES" -gt 1 ] && FORMATO="carrossel ${NSLIDES}x"
+if [ "$FORMATO" = "reels" ]; then
+  IMGMD="**Vídeo:** https://raw.githubusercontent.com/$REPO_SLUG/$BRANCH/posts-queue/$VIDEO"$'\n'
+  FORMATO_LABEL="reels"
+else
+  IMGMD=""
+  for img in "${IMAGES[@]}"; do
+    IMGMD="$IMGMD![${img}](https://raw.githubusercontent.com/$REPO_SLUG/$BRANCH/posts-queue/$img)"$'\n'
+  done
+  FORMATO_LABEL="imagem única"; [ "$NSLIDES" -gt 1 ] && FORMATO_LABEL="carrossel ${NSLIDES}x"
+fi
 BODY="$(cat <<EOF
 ${IMGMD}
-**Formato:** $FORMATO
+**Formato:** $FORMATO_LABEL
 **Pilar:** $PILAR
 **Agendado para:** $SCHED
 
@@ -248,7 +293,7 @@ Merge = aprovado (entra em \`posts-queue/\` e o n8n publica no próximo ciclo, a
 EOF
 )"
 gh_pr() { gh pr create --repo "$REPO_SLUG" --base main --head "$BRANCH" \
-  --title "post: $SLUG ($FORMATO, $PILAR)" --body "$BODY"; }
+  --title "post: $SLUG ($FORMATO_LABEL, $PILAR)" --body "$BODY"; }
 PR_URL="$(retry "gh pr create" -- gh_pr)" || abort "gh pr create falhou"
 
 # ===== 11. Histórico + volta pra main =====
@@ -261,6 +306,6 @@ log "PR aberto: $PR_URL"
 # ===== 12. Avisar no WhatsApp (não-fatal) =====
 STEP="avisar WhatsApp"
 notify_wa "$(printf '\xF0\x9F\x93\xB2 *Novo post pra aprovar*\n%s (%s \xC2\xB7 %s)\nAgendado: %s\n\nRevisar e dar merge: %s' \
-  "$SLUG" "$FORMATO" "$PILAR" "$SCHED" "$PR_URL")"
+  "$SLUG" "$FORMATO_LABEL" "$PILAR" "$SCHED" "$PR_URL")"
 
 log "=== fim ==="

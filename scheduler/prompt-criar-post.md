@@ -46,11 +46,8 @@ busca web para achar dados/fatos que o sustentem. Caso contrário, use a busca w
 atual** (tendência, dado, notícia ou dor recorrente) de automação/IA para empresas que combine com o pilar de hoje.
 Sempre traduza para a linguagem do dono de empresa.
 
-## Formato: imagem única OU carrossel
-Decida pelo tema/pilar:
-- **Imagem única** (1 lâmina): mensagem direta, 1 ideia.
-- **Carrossel (3 a 6 lâminas)**: quando o tema rende sequência — passo a passo, lista, antes/depois, mito x verdade.
-  Narrativa: **lâmina 1 = capa/gancho**; lâminas do meio = valor; **última lâmina = CTA** (WhatsApp).
+## Formato
+__FORMATO_INSTRUCAO__
 
 ## Saída — grave EXATAMENTE estes dois arquivos (nada além disso)
 
