@@ -11,14 +11,14 @@
     "pilar": "dor",
     "tema": "automacao",
     "gancho": "Quantas vezes por dia alguém pergunta 'e aí, já resolveu meu chamado?'",
-    "caso": "Sistema de automação de chamados: sistema que monitora chamados no banco e fecha automaticamente com log de auditoria — sem ninguém acompanhar manualmente."
+    "caso": "Sistema de automação de chamados: monitora chamados no banco e fecha automaticamente com log de auditoria — sem ninguém acompanhar manualmente."
   },
   {
     "id": "dor-sistema-fora",
     "pilar": "dor",
     "tema": "infra",
     "gancho": "Seu sistema saiu do ar e quem avisou foi o cliente?",
-    "caso": "Monitoramento proativo (Zabbix/Grafana) alerta antes do cliente perceber — implantado para clientes reais."
+    "caso": "Monitoramento proativo (Zabbix/Grafana) alerta antes do cliente perceber — implantado em produção para clientes reais."
   },
   {
     "id": "dor-multiplos-fornecedores",
@@ -46,7 +46,7 @@
     "pilar": "antes-depois",
     "tema": "automacao",
     "gancho": "De alguém revisando chamado por chamado pra um robô que fecha sozinho a cada 30 minutos.",
-    "caso": "Sistema de automação de chamados: Python + Docker consultando a API de chamados via OAuth2 e fechando automaticamente com auditoria completa."
+    "caso": "Sistema de automação de chamados: Python + Docker consultando a API via OAuth2 e fechando automaticamente com auditoria completa."
   },
   {
     "id": "antesdepois-atendimento-whatsapp",
@@ -67,7 +67,7 @@
     "pilar": "antes-depois",
     "tema": "sistemas",
     "gancho": "De planilha compartilhada por e-mail pra um painel que todo mundo vê em tempo real.",
-    "caso": "dashboard de gestão de projetos em React + Supabase, deploy automatizado em Docker Swarm."
+    "caso": "Dashboard de gestão de projetos em React + Supabase, deploy automatizado em Docker Swarm."
   },
   {
     "id": "educacao-o-que-e-automacao",
@@ -123,21 +123,21 @@
     "pilar": "prova",
     "tema": "automacao",
     "gancho": "Chamados fechados sozinhos, a cada 30 minutos, com log de auditoria completo.",
-    "caso": "Sistema de automação de chamados em Python 3.11 + Docker, monitorando PostgreSQL e consultando a API sistema via OAuth2."
+    "caso": "Automação de chamados em Python 3.11 + Docker, monitorando PostgreSQL e consultando API externa via OAuth2."
   },
   {
     "id": "prova-plataforma-publica",
     "pilar": "prova",
     "tema": "sistemas",
     "gancho": "Plataforma de trilhas de aprendizado em produção pra educação pública.",
-    "caso": "Plataforma educacional: plataforma Laravel de trilhas de aprendizado, entregue com documentação e treinamento da equipe."
+    "caso": "Plataforma Laravel de trilhas de aprendizado, entregue com documentação e treinamento da equipe."
   },
   {
     "id": "prova-monitoramento-sla",
     "pilar": "prova",
     "tema": "monitoramento",
     "gancho": "Ambientes com SLA acompanhado de verdade, painel por painel.",
-    "caso": "Zabbix + Grafana implantados para clientes reais, com templates customizados de dashboard."
+    "caso": "Zabbix + Grafana implantados com templates customizados de dashboard para clientes reais."
   },
   {
     "id": "inspirado-golpes-ia-processo",
