@@ -1,0 +1,11 @@
+.git
+.gitignore
+.scheduler
+posts-queue
+docs
+**/*.log
+**/tests
+node_modules
+.env
+*.token
+ig_token

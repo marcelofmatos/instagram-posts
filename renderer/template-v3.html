@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="fonts.css" />
+<style>
+  :root{
+    /* ===== Tokens da marca Marcelo Matos | Dev & IA (v2) ===== */
+    --bg:#0a0617;
+    --glow-roxo:#7b3aec;       /* glow superior-esquerdo */
+    --glow-ciano:#1d93b8;      /* glow superior-direito */
+    --marca-roxo:#7b3aec;      /* quadrado do logo */
+    --ciano:#2fcfe9;           /* eyebrow + CTA (contraste alto p/ thumbnail) */
+    --grad-a:#46a0f0;          /* início do gradiente do título (azul-ciano) */
+    --grad-b:#a85cf2;          /* fim do gradiente do título (roxo) */
+    --texto:#ffffff;
+    --corpo:#e4e0f4;           /* corpo: lavanda quase branca — leitura no grid */
+    --suave:#8d86a8;           /* handle / legendas discretas */
+    --linha:rgba(255,255,255,.16);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1080px;height:1350px}
+  .canvas{
+    position:relative;width:1080px;height:1350px;overflow:hidden;
+    background:
+      radial-gradient(120% 80% at 8% 0%, rgba(123,58,236,.48) 0%, rgba(123,58,236,0) 46%),
+      radial-gradient(110% 75% at 100% 4%, rgba(29,147,184,.46) 0%, rgba(29,147,184,0) 44%),
+      radial-gradient(95% 62% at 50% 110%, rgba(123,58,236,.34) 0%, rgba(123,58,236,0) 55%),
+      var(--bg);
+    color:var(--texto);
+    font-family:'Inter',sans-serif;
+    /* zona segura: o grid novo do IG usa célula 3:4 e corta ~34px de cada
+       lateral do 4:5. Padding lateral folgado (116px) mantém o texto principal
+       bem dentro da área visível, sem corte. */
+    padding:96px 116px 92px;
+    display:flex;flex-direction:column;
+  }
+  /* malha de fundo sutil */
+  .canvas::before{
+    content:"";position:absolute;inset:0;opacity:.05;pointer-events:none;
+    background-image:linear-gradient(var(--linha) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--linha) 1px,transparent 1px);
+    background-size:90px 90px;
+  }
+  .canvas>*{position:relative;z-index:1}
+
+  /* v3: ícone temático de fundo — apagado, no canto SUPERIOR DIREITO (área livre ao
+     lado do cabeçalho, acima do eyebrow); não cruza título/corpo/rodapé. */
+  .bgicon{
+    position:absolute;top:95px;right:-10px;z-index:0;
+    font-size:440px;line-height:1;opacity:.13;pointer-events:none;
+    filter:saturate(.85);
+  }
+
+  /* ===== Header ===== */
+  .top{display:flex;align-items:flex-start;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:22px}
+  .logo{
+    width:84px;height:84px;border-radius:22px;
+    background:linear-gradient(145deg,#8b4bff,#6a28d8);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 30px rgba(123,58,236,.45);
+  }
+  .logo span{font-family:'Poppins',sans-serif;font-weight:800;font-size:34px;color:#fff;letter-spacing:-1px}
+  .who .name{font-family:'Poppins',sans-serif;font-weight:800;font-size:38px;line-height:1.05}
+  .who .handle{font-size:26px;color:var(--suave);margin-top:4px}
+  .dots{display:flex;align-items:center;gap:14px;margin-top:34px}
+  .dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.26)}
+  .dot.on{background:var(--ciano);box-shadow:0 0 16px rgba(47,207,233,.7)}
+
+  /* ===== Corpo central ===== */
+  .mid{flex:1;display:flex;flex-direction:column;justify-content:center}
+  /* v2: barra de acento sobre o título — dá estrutura e "para o dedo" */
+  .mid::before{
+    content:"";display:block;width:84px;height:9px;border-radius:999px;
+    background:linear-gradient(90deg,var(--ciano),var(--grad-b));
+    box-shadow:0 0 22px rgba(47,207,233,.55);margin-bottom:30px;
+  }
+  /* v2: eyebrow em chip (pílula) — mais "desenhado", destaca no thumbnail */
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:14px;align-self:flex-start;
+    font-family:'Poppins',sans-serif;font-weight:700;font-size:28px;letter-spacing:3px;
+    text-transform:uppercase;color:var(--ciano);margin-bottom:30px;
+    padding:14px 26px;border-radius:999px;
+    border:2px solid rgba(47,207,233,.45);background:rgba(47,207,233,.10);
+  }
+  .eyebrow::before{
+    content:"";width:14px;height:14px;border-radius:50%;
+    background:var(--ciano);box-shadow:0 0 14px rgba(47,207,233,.8);
+  }
+  .title{
+    font-family:'Poppins',sans-serif;font-weight:800;font-size:var(--title-size,96px);
+    line-height:1.03;letter-spacing:-1.5px;
+    background:linear-gradient(96deg,var(--grad-a) 0%,var(--grad-b) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .body{font-size:42px;line-height:1.42;color:var(--corpo);margin-top:34px;max-width:840px}
+  .list{margin-top:40px;display:flex;flex-direction:column;gap:24px}
+  .list .item{display:flex;align-items:center;gap:22px;font-size:42px;color:var(--texto)}
+  .list .item .ic{font-size:46px;line-height:1;width:56px;text-align:center}
+  .list .item.step .ic{
+    font-family:'Poppins',sans-serif;font-weight:800;font-size:34px;color:#fff;
+    width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(145deg,#8b4bff,#6a28d8);
+  }
+
+  /* ===== Footer ===== */
+  .foot{margin-top:40px}
+  .rule{height:2px;background:var(--linha);margin-bottom:30px}
+  .foot .row{display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .foot .at{font-family:'Poppins',sans-serif;font-weight:700;font-size:34px;color:#fff}
+  /* v2: CTA em pílula preenchida — lê como botão, mais cliques pro perfil */
+  .foot .cta{
+    font-family:'Poppins',sans-serif;font-weight:800;font-size:30px;color:#07121a;
+    padding:18px 32px;border-radius:999px;white-space:nowrap;
+    background:linear-gradient(135deg,var(--ciano),var(--grad-a));
+    box-shadow:0 10px 26px rgba(47,207,233,.32);
+  }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="bgicon">{{BG_ICON}}</div>
+    <div class="top">
+      <div class="brand">
+        <div class="logo"><span>&lt;/&gt;</span></div>
+        <div class="who">
+          <div class="name">Marcelo Matos</div>
+          <div class="handle">marcelomatos.dev</div>
+        </div>
+      </div>
+      {{PROGRESS}}
+    </div>
+
+    <div class="mid">
+      <div class="eyebrow">{{EYEBROW}}</div>
+      <div class="title">{{TITLE}}</div>
+      {{CONTENT}}
+    </div>
+
+    <div class="foot">
+      <div class="rule"></div>
+      <div class="row">
+        <div class="at">@marcelomatos.dev</div>
+        <div class="cta">{{CTA}}</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
