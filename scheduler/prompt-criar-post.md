@@ -56,13 +56,17 @@ __FORMATO_INSTRUCAO__
    - Cada item: `num` (sequencial 1,2,3…), `eyebrow` (CAIXA ALTA), `title` (curto, legível no thumbnail),
      **um** de `body`/`bullets`/`steps`, `cta`, `bg` (UM emoji só — sem texto — que ilustra a ideia
      daquela lâmina; ex.: ⏱️ tempo, 🧩 integração, 💸 custo, 📉 perda, 🤖 automação), e `query`
-     (2–4 palavras-chave EM INGLÊS de uma foto de banco que ilustra a lâmina; ex.: "automation workflow dark",
-     "developer working laptop night", "frustrated customer waiting phone").
+     (2–4 palavras-chave EM INGLÊS de uma foto de banco que ilustra a lâmina). **A foto NÃO PODE
+     ter pessoas** (regra do Marcelo): descreva objetos, cenas, tecnologia, ambientes ou conceitos
+     abstratos — nunca gente, rostos, mãos, equipes ou retratos. Evite termos que puxam pessoas
+     (`person`, `people`, `man`, `woman`, `team`, `meeting`, `customer`, `developer working`,
+     `conversation`, `portrait`, `hands`). Prefira `dark`, `abstract`, `minimal`, `desk`, `closeup`,
+     `technology`; ex.: "automation workflow dark", "empty office desk night", "abstract data network".
 ```json
 [
-  { "num": 1, "eyebrow": "RÓTULO", "title": "Capa curta e forte", "body": "Gancho.", "cta": "Arrasta →", "bg": "⏱️", "query": "business time pressure dark" },
-  { "num": 2, "eyebrow": "RÓTULO", "title": "Lâmina de valor", "bullets": [{ "ic": "⚙️", "text": "ponto" }], "cta": "Arrasta →", "bg": "🧩", "query": "connected systems technology" },
-  { "num": 3, "eyebrow": "BORA", "title": "Fala comigo", "body": "CTA final.", "cta": "WhatsApp na bio →", "bg": "💬", "query": "business conversation laptop" }
+  { "num": 1, "eyebrow": "RÓTULO", "title": "Capa curta e forte", "body": "Gancho.", "cta": "Arrasta →", "bg": "⏱️", "query": "hourglass dark desk minimal" },
+  { "num": 2, "eyebrow": "RÓTULO", "title": "Lâmina de valor", "bullets": [{ "ic": "⚙️", "text": "ponto" }], "cta": "Arrasta →", "bg": "🧩", "query": "connected systems technology abstract" },
+  { "num": 3, "eyebrow": "BORA", "title": "Fala comigo", "body": "CTA final.", "cta": "WhatsApp na bio →", "bg": "💬", "query": "smartphone messaging closeup dark" }
 ]
 ```
    - `eyebrow` por pilar: dor→`DOR`/`PARE DE PERDER TEMPO`; antes-depois→`ANTES x DEPOIS`; educacao→`SEM JURIDIQUÊS`; prova→`PROVA`/`RESULTADO`.

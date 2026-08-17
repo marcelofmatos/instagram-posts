@@ -164,6 +164,9 @@ while IFS= read -r t; do
 done < <(jq -r '.[].title' "$OUT/conteudo.json")
 
 # ===== 4.5 Buscar fotos ilustrativas (Pexels) — não-fatal; sem foto => emoji =====
+# Regra do Marcelo: NUNCA usar foto com pessoas. Por isso a busca é só com o
+# viés "no people" — sem fallback pra query crua (que poderia trazer gente).
+# Sem resultado com o viés => sem foto nessa lâmina, cai no emoji (não é falha).
 STEP="buscar fotos (pexels)"
 rm -f "$OUT"/img-*.jpg
 if [ -n "${PEXELS_API_KEY:-}" ]; then
@@ -171,13 +174,17 @@ if [ -n "${PEXELS_API_KEY:-}" ]; then
     ii="$(printf '%02d' "$i")"
     q="$(jq -r ".[$((i-1))].query // empty" "$OUT/conteudo.json")"
     [ -n "$q" ] || continue
-    qenc="$(jq -rn --arg q "$q" '$q|@uri')"
+    qbias="$(jq -rn --arg q "$q no people" '$q|@uri')"
+    # per_page=15 + escolha aleatória: variedade, sem sempre repetir a 1ª foto.
     pexels_search() { curl -fsS -m 20 -H "Authorization: $PEXELS_API_KEY" \
-      "https://api.pexels.com/v1/search?orientation=portrait&per_page=1&query=$qenc"; }
+      "https://api.pexels.com/v1/search?orientation=portrait&per_page=15&query=$qbias"; }
     resp="$(retry "pexels $ii" -- pexels_search 2>>"$LOG")" \
       || { log "pexels: busca falhou ($ii); usando emoji"; continue; }
-    url="$(printf '%s' "$resp" | jq -r '.photos[0].src.portrait // .photos[0].src.large // empty')"
-    [ -n "$url" ] || { log "pexels: sem resultado p/ \"$q\" ($ii); usando emoji"; continue; }
+    url="$(printf '%s' "$resp" | jq -r --argjson r "$RANDOM" '
+      (.photos | length) as $n
+      | if $n == 0 then empty
+        else (.photos[$r % $n] | .src.portrait // .src.large // empty) end')"
+    [ -n "$url" ] || { log "pexels: sem resultado (sem pessoas) p/ \"$q\" ($ii); usando emoji"; continue; }
     pexels_dl() { curl -fsSL -m 30 "$url" -o "$OUT/img-$ii.jpg"; }
     retry "pexels dl $ii" -- pexels_dl >>"$LOG" 2>&1 \
       || { rm -f "$OUT/img-$ii.jpg"; log "pexels: download falhou ($ii); usando emoji"; }
