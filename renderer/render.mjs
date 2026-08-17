@@ -39,6 +39,8 @@ template = template.replace(
   /<link rel="stylesheet" href="fonts\.css" \/>/,
   `<style>\n${fontCss}\n</style>`
 );
+// Logo da marca — caminho absoluto pelo mesmo motivo das fontes acima.
+template = template.replace('{{LOGO_SRC}}', `file://${join(__dir, 'brand', 'logo.png')}`);
 
 function buildContent(p) {
   if (Array.isArray(p.bullets) && p.bullets.length) {

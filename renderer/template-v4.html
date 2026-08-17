@@ -64,11 +64,7 @@
     padding:26px 34px;border-bottom:2px solid var(--linha);
   }
   .brand{display:flex;align-items:center;gap:20px}
-  .logo{
-    width:60px;height:60px;border:2px solid var(--texto);background:#000;
-    display:flex;align-items:center;justify-content:center;flex:none;
-  }
-  .logo span{font-family:var(--mono);font-weight:700;font-size:26px;color:var(--ciano)}
+  .logo{width:64px;height:64px;flex:none;display:block}
   .who .path{font-family:var(--mono);font-size:26px;color:var(--suave)}
   .who .path b{color:var(--texto)}
   /* bolinhas de progresso (só em carrossel) — quadradas, no estilo da moldura */
@@ -127,7 +123,7 @@
       <div class="corner bl"></div><div class="corner br"></div>
       <div class="winbar">
         <div class="brand">
-          <div class="logo"><span>&lt;/&gt;</span></div>
+          <img class="logo" src="{{LOGO_SRC}}" alt="" />
           <div class="who"><div class="path"><b>marcelomatos</b>/automacao.sh</div></div>
         </div>
         {{PROGRESS}}

@@ -48,11 +48,7 @@
     padding:26px 34px;border-bottom:2px solid var(--linha);
   }
   .brand{display:flex;align-items:center;gap:20px}
-  .logo{
-    width:60px;height:60px;border:2px solid var(--texto);background:#000;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .logo span{font-family:var(--mono);font-weight:700;font-size:26px;color:var(--ciano)}
+  .logo{width:64px;height:64px;flex:none;display:block}
   .path{font-family:var(--mono);font-size:26px;color:var(--suave)}
   .path b{color:var(--texto)}
   .dots{display:flex;gap:10px}
@@ -101,7 +97,7 @@
       <div class="corner bl"></div><div class="corner br"></div>
       <div class="winbar">
         <div class="brand">
-          <div class="logo"><span>&lt;/&gt;</span></div>
+          <img class="logo" src="{{LOGO_SRC}}" alt="" />
           <div class="path"><b>marcelomatos</b>/reels.mp4</div>
         </div>
         <div class="dots"><i></i><i></i><i></i></div>

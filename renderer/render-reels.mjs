@@ -34,7 +34,7 @@ const fontCss = readFileSync(join(fontsDir, 'fonts.css'), 'utf8')
 const baseHtml = template.replace(
   /<link rel="stylesheet" href="fonts\.css" \/>/,
   `<style>\n${fontCss}\n</style>`
-);
+).replace('{{LOGO_SRC}}', `file://${join(__dir, 'brand', 'logo.png')}`);
 
 const slide = JSON.parse(readFileSync(slidePath, 'utf8'));
 const { rest: titleRest, last: titleLast } = splitLastWord(slide.title);
