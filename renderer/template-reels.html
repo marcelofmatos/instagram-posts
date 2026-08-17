@@ -32,6 +32,11 @@
                      linear-gradient(90deg,var(--linha) 1px,transparent 1px);
     background-size:60px 60px;
   }
+  /* foto de fundo (opcional, via Pexels) — abaixo do frame; scrim garante
+     legibilidade do texto por cima */
+  .photo{position:absolute;inset:0;z-index:1;background-size:cover;background-position:center}
+  .scrim{position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg,rgba(10,6,23,.55) 0%,rgba(10,6,23,.82) 55%,rgba(10,6,23,.96) 100%);}
   .frame{
     position:relative;z-index:2;width:100%;height:100%;
     border:2px solid var(--linha);
@@ -92,6 +97,7 @@
 </head>
 <body>
   <div class="canvas">
+    {{PHOTO_LAYER}}
     <div class="frame">
       <div class="corner tl"></div><div class="corner tr"></div>
       <div class="corner bl"></div><div class="corner br"></div>

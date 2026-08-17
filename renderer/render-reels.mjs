@@ -4,7 +4,7 @@
 // Uso: node render-reels.mjs <slide.json> <out-dir>
 // Sempre grava em <out-dir>/post-01.mp4 (mesma convenção de nome fixo do
 // render.mjs — o slug final é aplicado depois, no gerar-post.sh).
-import { readFileSync, writeFileSync, mkdirSync, unlinkSync, readdirSync, renameSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, unlinkSync, readdirSync, renameSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
@@ -27,14 +27,35 @@ if (!CHROME) { console.error('Chrome/Chromium não encontrado.'); process.exit(1
 try { execFileSync('which', ['ffmpeg']); } catch { console.error('ffmpeg não encontrado.'); process.exit(1); }
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const template = readFileSync(join(__dir, 'template-reels.html'), 'utf8');
+
+// Variações de composição (mesma marca/cores/logo, layout diferente) —
+// sorteada a cada geração, igual à trilha de áudio: dá pra somar mais
+// variações só adicionando um arquivo template-reels-*.html, sem mudar código.
+const variants = readdirSync(__dir).filter(f => /^template-reels.*\.html$/.test(f));
+const templateFile = pickFile(variants) || 'template-reels.html';
+const template = readFileSync(join(__dir, templateFile), 'utf8');
+
 const fontsDir = join(__dir, 'fonts');
 const fontCss = readFileSync(join(fontsDir, 'fonts.css'), 'utf8')
   .replace(/url\((f\d+\.woff2)\)/g, (_, f) => `url(file://${join(fontsDir, f)})`);
+
+// Foto de fundo (opcional; buscada pelo gerar-post.sh antes do render) —
+// mesmo tratamento do template do feed: sem foto, cai no fundo em degradê.
+const imgPath = join(outDir, 'img-01.jpg');
+const photoLayer = existsSync(imgPath)
+  ? `<div class="photo" style="background-image:url(file://${imgPath})"></div><div class="scrim"></div>`
+  : '';
+const commitHash = Math.floor(Math.random() * 0xfffffff).toString(16).padStart(7, '0');
+
 const baseHtml = template.replace(
   /<link rel="stylesheet" href="fonts\.css" \/>/,
   `<style>\n${fontCss}\n</style>`
-).replace('{{LOGO_SRC}}', `file://${join(__dir, 'brand', 'logo.png')}`);
+)
+  .replace('{{LOGO_SRC}}', `file://${join(__dir, 'brand', 'logo.png')}`)
+  .replace('{{PHOTO_LAYER}}', photoLayer)
+  .replace('{{COMMIT_HASH}}', commitHash);
+
+console.log(`✓ variante: ${templateFile}`);
 
 const slide = JSON.parse(readFileSync(slidePath, 'utf8'));
 const { rest: titleRest, last: titleLast } = splitLastWord(slide.title);
